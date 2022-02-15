@@ -20,12 +20,13 @@ public:
     int Deinit();
 
 private:
+    int Parse_Configuration();
     int Register_Modules();
-    int Load_Modules();
-    int Configure_Modules();
+    int Assign_Module_Parameters(Module* module);
 
     const char* modules_cfg;
-    std::unordered_map<Module*, void*> loaded_modules;
+    pugi::xml_document modules_xml;
+    std::vector<Module*> loaded_modules;
 };
 
 #endif /* SPIDER_H */

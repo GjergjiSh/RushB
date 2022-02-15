@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <modules>
-   <module name="libtest.so">
+   <module name="Test">
         <parameters>
             <parameter name="p1" value="v1" />
             <parameter name="p2" value="v2" />

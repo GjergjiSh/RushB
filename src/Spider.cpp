@@ -13,12 +13,19 @@ Spider::~Spider()
 
 int Spider::Init()
 {
+    // Parse the XML Configuration File
+    if (Parse_Configuration() != 0) {
+        return -1;
+    }
+
     // Load the Modules in the lib folder
-    Load_Modules();
+    if (Register_Modules() != 0) {
+        return -1;
+    }
 
     // Initialize each loaded module
     for (auto module : loaded_modules) {
-        if (module.first->Init() != 0) {
+        if (module->Init() != 0) {
             LOG_ERROR("Failed to initialize module"); //missing name for log
             return -1;
         };
@@ -32,33 +39,44 @@ int Spider::Deinit()
 {
     for (auto module : loaded_modules) {
 
-        module.first->Deinit();
+        module->Deinit();
 
-        Destroy_t* Destroy_Module = (Destroy_t*)dlsym(module.second, "Destroy");
+        Destroy_t* Destroy_Module = (Destroy_t*)dlsym(module->lib_handle, "Destroy");
         const char* dlsym_error = dlerror();
         if (dlsym_error) {
             LOG_ERROR_DESCRIPTION("Failed to load symbol destroy: ", dlsym_error)
         }
 
-        Destroy_Module(module.first);
+        Destroy_Module(module);
 
-        if (dlclose(module.second) != 0) {
+        if (dlclose(module->lib_handle) != 0) {
             LOG_ERROR_DESCRIPTION("Failed to destroy module :", dlerror());
         };
     }
-    LOG_INFO("Deinitialization successful")
+    LOG_INFO("Deinitialization finished");
     return 0;
 }
 
 int Spider::Run()
 {
     for (auto module : loaded_modules) {
-        module.first->Cycle_Step();
+        module->Cycle_Step();
     }
     return 0;
 }
 
-int Spider::Load_Modules()
+int Spider::Parse_Configuration()
+{
+    pugi::xml_parse_result parse_result = modules_xml.load_file(modules_cfg);
+    if (!parse_result) {
+        LOG_ERROR_DESCRIPTION("Failed to parse the modules configuration file",
+            parse_result.description());
+        return -1;
+    }
+    return 0;
+}
+
+int Spider::Register_Modules()
 {
     // Iterate the available libraries in the lib folder
     std::string path = "/home/shorty/Repos/spider/bin/lib";
@@ -66,8 +84,8 @@ int Spider::Load_Modules()
         std::cout << entry.path() << std::endl;
 
         // Load the library
-        void* module_handle = dlopen(entry.path().c_str(), RTLD_LAZY);
-        if (!module_handle) {
+        void* lib_handle = dlopen(entry.path().c_str(), RTLD_LAZY);
+        if (!lib_handle) {
             LOG_ERROR_DESCRIPTION("Failed to load library: ", dlerror());
             return -1;
         }
@@ -76,57 +94,39 @@ int Spider::Load_Modules()
         dlerror();
 
         // load the Create Symbol of the Module
-        Create_t* Create_Module = (Create_t*)dlsym(module_handle, "Create");
+        Create_t* Create_Module = (Create_t*)dlsym(lib_handle, "Create");
         const char* dlsym_error = dlerror();
         if (dlsym_error) {
-            LOG_ERROR_DESCRIPTION("Failed to load symbol create: ", dlsym_error)
+            LOG_ERROR_DESCRIPTION("Failed to load symbol create: ", dlsym_error);
             return -1;
         }
 
         // Create the Module Instance
         Module* module = Create_Module();
+        module->lib_handle = lib_handle;
+
+        // Assign the parameters defined in the XML config to the Module
+        Assign_Module_Parameters(module);
 
         // Register the Module Instance
-        loaded_modules.insert(std::make_pair(module, module_handle));
+        loaded_modules.push_back(module);
     }
     return 0;
 }
 
-int Spider::Register_Modules()
+int Spider::Assign_Module_Parameters(Module* module)
 {
-    Load_Modules();
+    std::cout << "Parameters for Module: " << module->name << std::endl;
+    pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name);
+    pugi::xml_node parameters_node = module_node.child("parameters");
 
-    return 0;
-}
-
-int Spider::Configure_Modules()
-{
-    // Parse the modules configuration file
-    pugi::xml_document modules_xml;
-    pugi::xml_parse_result parse_result = modules_xml.load_file(modules_cfg);
-    if (!parse_result) {
-        LOG_ERROR_DESCRIPTION("Failed to parse the modules configuration file",
-            parse_result.description());
-        return -1;
+    for (pugi::xml_node parameter : parameters_node.children()) {
+                auto name = parameter.attribute("name").value();
+                auto val = parameter.attribute("value").value();
+                std::cout << "Parameter: " << name << " -> " <<  val;
+                module->parameters.insert(std::make_pair(name,val));
+                std::cout << " Registered" << std::endl;
     }
 
-    std::unordered_map<std::string, std::string> module_parameters;
-
-    // Iterate through each module
-    pugi::xml_node modules = modules_xml.child("modules");
-    for (pugi::xml_node module : modules) {
-        // Iterate through a single modules parameters
-        std::cout << "Module: " << module.attribute("name").value() << std::endl;
-        pugi::xml_node parameters = module.child("parameters");
-            for (pugi::xml_node parameter : parameters.children()) {
-                std::cout << parameter.attribute("name").value() << parameter.attribute("value").value() << std::endl;
-                // Register the parameters
-                module_parameters.emplace(std::make_pair(parameter.attribute("name").value(), parameter.attribute("value").value()));
-            }
-
-        // Note: Not sure if this actually deletes all the elements of the map because they are pointers
-        module_parameters.clear();
-
-    }
     return 0;
 }
