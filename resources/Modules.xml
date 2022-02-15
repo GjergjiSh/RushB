@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<modules>
+   <module name="libtest.so">
+        <parameters>
+            <parameter name="p1" value="v1" />
+            <parameter name="p2" value="v2" />
+        </parameters>
+    </module>
+    <module name="m2">
+        <parameters>
+            <parameter name="p3" value="v3" />
+            <parameter name="p4" value="v4" />
+        </parameters>
+    </module>
+</modules>
+

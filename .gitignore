@@ -1,0 +1,5 @@
+bin
+misc
+*.o
+*.out
+*.so
