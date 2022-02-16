@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <modules>
-   <module name="Writer">
+<module name="Writer">
+    <parameters>
+        <parameter name="TOP_SERVO" value="10" />
+        <parameter name="TOP_SERVO" value="20" />
+        <parameter name="TOP_SERVO" value="30" />
+    </parameters>
+</module>
+<module name="Reader">
+    <parameters>
+        <parameter name="HELLO" value="Reader says Hello World :)" />
+    </parameters>
+</module>
+    <module name="Controller">
         <parameters>
-            <parameter name="p1" value="v1" />
-            <parameter name="p2" value="v2" />
-        </parameters>
-    </module>
-    <module name="Reader">
-        <parameters>
-            <parameter name="p3" value="v3" />
-            <parameter name="p4" value="v4" />
+            <parameter name="DEVICE_PATH" value="/dev/input/by-id/usb-Inno_GamePad.._Inno_GamePad.._0000001-joystick" />
         </parameters>
     </module>
 </modules>
