@@ -15,6 +15,16 @@ public:
     const char* name;
     std::unordered_map<std::string, std::string> parameters;
     void* lib_handle;
+
+    //Shared Methods
+    void Print_Config() {
+        for (auto parameter : parameters) {
+            std::cout << "[I][" << name << "]"
+                      << " Parameter: " << parameter.first
+                      << " Value: " << parameter.second
+                      << std::endl;
+        }
+    }
 };
 
 typedef Module* Create_t();

@@ -2,7 +2,7 @@ PRJ_PATH = -I./include
 
 BUILD_PATH = ./bin
 
-LIB_PATH = $(BUILD_PATH)/lib
+LIB_PATH = $(BUILD_PATH)/modules
 
 OBJ_PATH = $(BUILD_PATH)/obj
 

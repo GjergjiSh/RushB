@@ -1,9 +1,9 @@
 #include "Spider.h"
-
+#include  <chrono>
 
 Spider::Spider(const char* modules_cfg) : modules_cfg(modules_cfg)
 {
-
+    LOG_INFO(std::string("Spider Version: ").append(VERSION));
 }
 
 Spider::~Spider()
@@ -14,19 +14,17 @@ Spider::~Spider()
 int Spider::Init()
 {
     // Parse the XML Configuration File
-    if (Parse_Configuration() != 0) {
+    if (Parse_Configuration() != 0)
         return -1;
-    }
 
     // Load the Modules in the lib folder
-    if (Register_Modules() != 0) {
+    if (Register_Modules() != 0)
         return -1;
-    }
 
     // Initialize each loaded module
     for (auto module : loaded_modules) {
         if (module->Init() != 0) {
-            LOG_ERROR("Failed to initialize module"); //missing name for log
+            LOG_ERROR(std::string("Failed to initialize module: ").append(module->name));
             return -1;
         };
     }
@@ -78,11 +76,9 @@ int Spider::Parse_Configuration()
 
 int Spider::Register_Modules()
 {
+    auto start = std::chrono::system_clock::now();
     // Iterate the available libraries in the lib folder
-    std::string path = "/home/shorty/Repos/spider/bin/lib";
-    for (const auto & entry : std::filesystem::directory_iterator(path)) {
-        std::cout << entry.path() << std::endl;
-
+    for (const auto & entry : std::filesystem::directory_iterator("./modules")) {
         // Load the library
         void* lib_handle = dlopen(entry.path().c_str(), RTLD_LAZY);
         if (!lib_handle) {
@@ -105,28 +101,40 @@ int Spider::Register_Modules()
         Module* module = Create_Module();
         module->lib_handle = lib_handle;
 
+        // Only register if the module is in the XML config
+        pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name);
+        if (!module_node) {
+            delete module;
+            continue;
+        }
+
         // Assign the parameters defined in the XML config to the Module
         Assign_Module_Parameters(module);
 
         // Register the Module Instance
         loaded_modules.push_back(module);
     }
+    auto end = std::chrono::system_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    LOG_TIME_INFO("Finished registering modules", elapsed.count());
     return 0;
 }
 
 int Spider::Assign_Module_Parameters(Module* module)
 {
-    std::cout << "Parameters for Module: " << module->name << std::endl;
+    // Find the module's node in the XML config file
     pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name);
     pugi::xml_node parameters_node = module_node.child("parameters");
 
+    // Assign the parameter names and values to the module
     for (pugi::xml_node parameter : parameters_node.children()) {
                 auto name = parameter.attribute("name").value();
                 auto val = parameter.attribute("value").value();
-                std::cout << "Parameter: " << name << " -> " <<  val;
                 module->parameters.insert(std::make_pair(name,val));
-                std::cout << " Registered" << std::endl;
     }
+
+    // Print the assigned configuration
+    module->Print_Config();
 
     return 0;
 }

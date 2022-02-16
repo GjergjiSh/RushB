@@ -1,15 +1,15 @@
 #ifndef SPIDER_H
 #define SPIDER_H
 
-#include <pugixml.hpp>
-#include <vector>
-#include <iostream>
-#include "Common.h"
-#include <unordered_map>
+#include "LogUtils.h"
 #include "Module.h"
-#include <memory>
 #include <dlfcn.h>
 #include <filesystem>
+#include <iostream>
+#include <memory>
+#include <pugixml.hpp>
+#include <unordered_map>
+#include <vector>
 
 class Spider {
 public:
@@ -27,6 +27,7 @@ private:
     const char* modules_cfg;
     pugi::xml_document modules_xml;
     std::vector<Module*> loaded_modules;
+    const char* VERSION = "0.1";
 };
 
 #endif /* SPIDER_H */
