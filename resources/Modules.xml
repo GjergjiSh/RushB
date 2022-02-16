@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <modules>
-   <module name="Test">
+   <module name="Writer">
         <parameters>
             <parameter name="p1" value="v1" />
             <parameter name="p2" value="v2" />
         </parameters>
     </module>
-    <module name="Test3">
+    <module name="Reader">
         <parameters>
             <parameter name="p3" value="v3" />
             <parameter name="p4" value="v4" />

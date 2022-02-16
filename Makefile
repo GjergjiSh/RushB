@@ -8,6 +8,8 @@ OBJ_PATH = $(BUILD_PATH)/obj
 
 POST_BUILD = @mv
 
+COPY = @cp
+
 OBJ_PRJ = $(OBJ_PATH)/ModuleHandler.o $(OBJ_PATH)/Main.o
 
 CC = g++ -std=c++17 -static-libgcc -static-libstdc++ -fPIC $(PRJ_PATH) -m64 -msse2 -Wall -O2 -O3 -Wno-comment -Wno-deprecated-declarations -pthread -c
@@ -29,6 +31,7 @@ $(LIB_PATH):
 
 $(POST_BUILD):
 	$(POST_BUILD) ControlCenter $(BUILD_PATH)
+	@cp ./resources/Modules.xml $(BUILD_PATH)
 
 ControlCenter: $(OBJ_PRJ)
 	$(LD) $(OBJ_PRJ) $(LIB_PRJ) -o ControlCenter

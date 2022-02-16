@@ -4,9 +4,24 @@
 #include <iostream>
 #include <unordered_map>
 
+typedef struct {
+    int top_servo;
+    int right_servo;
+    int left_servo;
+} ServoValues_t;
+
+typedef struct {
+    float distance;
+} UltraSonicValues_t;
+
+typedef struct {
+    ServoValues_t servos;
+    UltraSonicValues_t uss;
+} SharedData_t;
+
 class Module {
 public:
-    Module(){}; //: name({}), parameters({}){};
+    Module(){};
     virtual ~Module(){};
     virtual int Init(void) = 0;
     virtual int Cycle_Step(void) = 0;
@@ -15,18 +30,10 @@ public:
     const char* name;
     std::unordered_map<std::string, std::string> parameters;
     void* lib_handle;
-
-    //Shared Methods
-    void Print_Config() {
-        for (auto parameter : parameters) {
-            std::cout << "[I][" << name << "]"
-                      << " Parameter: " << parameter.first
-                      << " Value: " << parameter.second
-                      << std::endl;
-        }
-    }
+    SharedData_t* shared_data;
 };
 
+// Factory Methods
 typedef Module* Create_t();
 typedef void Destroy_t(Module*);
 
