@@ -1,17 +1,17 @@
-#include "Spider.h"
+#include "ModuleHandler.h"
 #include  <chrono>
 
-Spider::Spider(const char* modules_cfg) : modules_cfg(modules_cfg)
+ModuleHandler::ModuleHandler(const char* modules_cfg) : modules_cfg(modules_cfg)
 {
-    LOG_INFO(std::string("Spider Version: ").append(VERSION));
+    LOG_INFO(std::string("ModuleHandler Version: ").append(VERSION));
 }
 
-Spider::~Spider()
+ModuleHandler::~ModuleHandler()
 {
 
 }
 
-int Spider::Init()
+int ModuleHandler::Init()
 {
     // Parse the XML Configuration File
     if (Parse_Configuration() != 0)
@@ -33,7 +33,7 @@ int Spider::Init()
     return 0;
 }
 
-int Spider::Deinit()
+int ModuleHandler::Deinit()
 {
     for (auto module : loaded_modules) {
 
@@ -55,7 +55,7 @@ int Spider::Deinit()
     return 0;
 }
 
-int Spider::Run()
+int ModuleHandler::Run()
 {
     for (auto module : loaded_modules) {
         module->Cycle_Step();
@@ -63,7 +63,7 @@ int Spider::Run()
     return 0;
 }
 
-int Spider::Parse_Configuration()
+int ModuleHandler::Parse_Configuration()
 {
     pugi::xml_parse_result parse_result = modules_xml.load_file(modules_cfg);
     if (!parse_result) {
@@ -74,7 +74,7 @@ int Spider::Parse_Configuration()
     return 0;
 }
 
-int Spider::Register_Modules()
+int ModuleHandler::Register_Modules()
 {
     auto start = std::chrono::system_clock::now();
     // Iterate the available libraries in the lib folder
@@ -120,7 +120,7 @@ int Spider::Register_Modules()
     return 0;
 }
 
-int Spider::Assign_Module_Parameters(Module* module)
+int ModuleHandler::Assign_Module_Parameters(Module* module)
 {
     // Find the module's node in the XML config file
     pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name);

@@ -8,7 +8,7 @@ OBJ_PATH = $(BUILD_PATH)/obj
 
 POST_BUILD = @mv
 
-OBJ_PRJ = $(OBJ_PATH)/Spider.o $(OBJ_PATH)/Main.o
+OBJ_PRJ = $(OBJ_PATH)/ModuleHandler.o $(OBJ_PATH)/Main.o
 
 CC = g++ -std=c++17 -static-libgcc -static-libstdc++ -fPIC $(PRJ_PATH) -m64 -msse2 -Wall -O2 -O3 -Wno-comment -Wno-deprecated-declarations -pthread -c
 
@@ -16,7 +16,7 @@ LD = g++ -static-libgcc -static-libstdc++ -m64 -Wall -Wl,--copy-dt-needed-entrie
 
 LIB_PRJ = -lpugixml -ldl
 
-all: $(OBJ_PATH) $(BUILD_PATH) $(LIB_PATH) Spider $(POST_BUILD)
+all: $(OBJ_PATH) $(BUILD_PATH) $(LIB_PATH) ControlCenter $(POST_BUILD)
 
 $(BUILD_PATH):
 	mkdir -p $(BUILD_PATH)
@@ -28,15 +28,15 @@ $(LIB_PATH):
 	mkdir -p $(LIB_PATH)
 
 $(POST_BUILD):
-	$(POST_BUILD) Spider $(BUILD_PATH)
+	$(POST_BUILD) ControlCenter $(BUILD_PATH)
 
-Spider: $(OBJ_PRJ)
-	$(LD) $(OBJ_PRJ) $(LIB_PRJ) -o Spider
+ControlCenter: $(OBJ_PRJ)
+	$(LD) $(OBJ_PRJ) $(LIB_PRJ) -o ControlCenter
 
 $(OBJ_PATH)/Main.o: ./src/Main.cpp
 	$(CC) -o $@ $?
 
-$(OBJ_PATH)/Spider.o: ./src/Spider.cpp
+$(OBJ_PATH)/ModuleHandler.o: ./src/ModuleHandler.cpp
 	$(CC) -o $@ $?
 
 clean:

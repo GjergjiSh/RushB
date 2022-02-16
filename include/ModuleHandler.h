@@ -1,5 +1,5 @@
-#ifndef SPIDER_H
-#define SPIDER_H
+#ifndef MODULEHANDLER_H
+#define MODULEHANDLER_H
 
 #include "LogUtils.h"
 #include "Module.h"
@@ -11,10 +11,10 @@
 #include <unordered_map>
 #include <vector>
 
-class Spider {
+class ModuleHandler {
 public:
-    Spider(const char* modules_cfg);
-    ~Spider();
+    ModuleHandler(const char* modules_cfg);
+    ~ModuleHandler();
     int Init();
     int Run();
     int Deinit();
@@ -30,4 +30,4 @@ private:
     const char* VERSION = "0.1";
 };
 
-#endif /* SPIDER_H */
+#endif /* MODULEHANDLER_H */
