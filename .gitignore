@@ -3,3 +3,4 @@ misc
 *.o
 *.out
 *.so
+.vscode
