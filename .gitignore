@@ -4,3 +4,11 @@ misc
 *.out
 *.so
 .vscode
+*.acn
+*.aux
+*.ist
+*.log
+*.lof
+*.toc
+*.out
+*.lot
