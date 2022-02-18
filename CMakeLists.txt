@@ -28,7 +28,11 @@ target_link_libraries(ControlCenter
     ${CMAKE_DL_LIBS}
 )
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/modules)
+add_custom_command(
+        TARGET ControlCenter POST_BUILD
+        COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/modules
+)
+
 add_custom_command(
         TARGET ControlCenter POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
@@ -38,7 +42,7 @@ add_custom_command(
 
 if (BUILD_MODULES)
 add_custom_command(TARGET ControlCenter POST_BUILD
-  COMMAND  cd ${MODULES_DIR} && mkdir build && cd build && cmake .. && make
+  COMMAND  cd ${MODULES_DIR} && mkdir -p build && cd build && cmake .. && make
 )
 
 add_custom_command(TARGET ControlCenter POST_BUILD
