@@ -8,10 +8,6 @@ set(MODULES_DIR ${CMAKE_HOME_DIRECTORY}/RushBModules)
 
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_BINARY_DIR}/modules ${MODULES_DIR}/build)
 
-# if(NOT BUILD_MODULES)
-#     set(BUILD_MODULES 0)
-# endif()
-
 add_executable(ControlCenter .
     src/Main.cpp
     src/ModuleHandler.cpp
