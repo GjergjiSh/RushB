@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+message ServoValues_Proto {
+    int32 top_servo = 1;
+    int32 right_servo = 2;
+    int32 left_servo = 3;
+}
+
+message UltraSonicValues_Proto {
+    float distance = 1;
+}
+
+message SharedData_Proto {
+    ServoValues_Proto servos = 1;
+    UltraSonicValues_Proto uss = 2;
+}
