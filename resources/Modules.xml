@@ -18,5 +18,14 @@
             <parameter name="DEVICE_PATH" value="/dev/input/by-id/usb-Inno_GamePad.._Inno_GamePad.._0000001-joystick" />
         </parameters>
     </module>
+    <module name="ZmqPipeline">
+        <parameters>
+            <parameter name="REMOTE" value="127.0.0.1" />
+            <parameter name="OUT_PORT" value="5554" />
+            <parameter name="IN_PORT" value="5554" />
+            <parameter name="PUB_SOCKET" value="SERVOS" />
+            <parameter name="SUB_SOCKET" value="USS" />
+        </parameters>
+    </module>
 </modules>
 
