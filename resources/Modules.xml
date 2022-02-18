@@ -2,7 +2,7 @@
 
 <modules>
 
-    <module name="Writer">
+    <!-- <module name="Writer">
         <parameters>
             <parameter name="TOP_SERVO" value="10" />
             <parameter name="RIGHT_SERVO" value="20" />
@@ -20,7 +20,7 @@
         <parameters>
             <parameter name="DEVICE_PATH" value="/dev/input/by-id/usb-Inno_GamePad.._Inno_GamePad.._0000001-joystick" />
         </parameters>
-    </module>
+    </module> -->
 
     <module name="ZmqPipeline">
         <parameters>

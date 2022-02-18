@@ -162,7 +162,8 @@ int ModuleHandler::Assign_Module_Parameters(Module* module)
 void ModuleHandler::Print_Module_Parameters(Module* module)
 {
     for (auto parameter : module->parameters) {
-        std::cout << "[I][" << module->name << "]"
+        std::cout << "[I][ModuleHandler] "
+                  <<  module->name << " -> "
                   << " Parameter: " << parameter.first
                   << " Value: " << parameter.second
                   <<  std::endl;
