@@ -7,7 +7,12 @@ Reader::Reader() {
 
 int Reader::Init()
 {
+    try {
     std::cout << parameters.at("HELLO") << std::endl;
+
+    } catch(std::exception& e) {
+        LOG_ERROR_DESCRIPTION("Failed to read parameter: ", e.what());
+    }
     return 0;
 }
 
