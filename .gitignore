@@ -13,3 +13,4 @@ misc
 *.out
 *.lot
 workspace.code-workspace
+build
