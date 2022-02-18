@@ -1,6 +1,3 @@
 [submodule "ModuleInterface"]
 	path = ModuleInterface
 	url = https://github.com/GjergjiSh/ModuleInterface.git
-[submodule "RushBModules"]
-	path = RushBModules
-	url = https://github.com/GjergjiSh/RushBModules.git
