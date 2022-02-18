@@ -4,8 +4,8 @@
 <module name="Writer">
     <parameters>
         <parameter name="TOP_SERVO" value="10" />
-        <parameter name="TOP_SERVO" value="20" />
-        <parameter name="TOP_SERVO" value="30" />
+        <parameter name="RIGHT_SERVO" value="20" />
+        <parameter name="LEFT_SERVO" value="30" />
     </parameters>
 </module>
 <module name="Reader">
