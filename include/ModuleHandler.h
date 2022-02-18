@@ -3,6 +3,8 @@
 
 #include "LogUtils.h"
 #include "ModuleInterface.h"
+#include "SignalHandler.h"
+
 #include <dlfcn.h>
 #include <filesystem>
 #include <iostream>
@@ -32,6 +34,7 @@ private:
     pugi::xml_document modules_xml;
     std::vector<Module*> registered_modules;
     SharedData_t shared_data;
+    SignalHandler sig_handler;
 };
 
 #endif /* MODULEHANDLER_H */

@@ -10,7 +10,7 @@ POST_BUILD = @mv
 
 COPY = @cp
 
-OBJ_PRJ = $(OBJ_PATH)/ModuleHandler.o $(OBJ_PATH)/Main.o
+OBJ_PRJ = $(OBJ_PATH)/ModuleHandler.o $(OBJ_PATH)/SignalHandler.o $(OBJ_PATH)/Main.o
 
 CC = g++ -std=c++17 -static-libgcc -static-libstdc++ -fPIC $(PRJ_PATH) -m64 -msse2 -Wall -O2 -O3 -Wno-comment -Wno-deprecated-declarations -pthread -c
 
@@ -40,6 +40,9 @@ $(OBJ_PATH)/Main.o: ./src/Main.cpp
 	$(CC) -o $@ $?
 
 $(OBJ_PATH)/ModuleHandler.o: ./src/ModuleHandler.cpp
+	$(CC) -o $@ $?
+
+$(OBJ_PATH)/SignalHandler.o: ./src/SignalHandler.cpp
 	$(CC) -o $@ $?
 
 clean:

@@ -26,6 +26,10 @@ int ModuleHandler::Init()
             return -1;
         };
     }
+
+    // Initialize the signal handler
+    sig_handler.Init();
+
     LOG_INFO("Initialization finished");
     return 0;
 }
@@ -49,27 +53,31 @@ int ModuleHandler::Deinit()
     return 0;
 }
 
+// Trigger cycle for each registered module
 int ModuleHandler::Run()
 {
-    // Trigger cycle for each registered module
-    for (auto module : registered_modules) {
-        if (verbose) {
-            // Print cycle time for each module
-            auto start = std::chrono::system_clock::now();
-            if (module->Cycle_Step() != 0) {
-                LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
-                return -1;
-            };
-            auto end = std::chrono::system_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-            LOG_TIME_INFO(std::string("Cycle target: ").append(module->name), elapsed.count());
-        } else {
-            if (module->Cycle_Step() != 0) {
-                LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
-                return -1;
-            };
+    while (!sig_handler.Received_Exit_Sig()) {
+        for (auto module : registered_modules) {
+            if (verbose) {
+                // Print cycle time for each module
+                auto start = std::chrono::system_clock::now();
+                if (module->Cycle_Step() != 0) {
+                    LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
+                    return -1;
+                };
+                auto end = std::chrono::system_clock::now();
+                auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+                LOG_TIME_INFO(std::string("Cycle target: ").append(module->name), elapsed.count());
+            } else {
+                // Trigger cycle without printing time info
+                if (module->Cycle_Step() != 0) {
+                    LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
+                    return -1;
+                };
+            }
         }
     }
+
     return 0;
 }
 
@@ -157,7 +165,7 @@ void ModuleHandler::Print_Module_Parameters(Module* module)
         std::cout << "[I][" << module->name << "]"
                   << " Parameter: " << parameter.first
                   << " Value: " << parameter.second
-                  << std::endl;
+                  <<  std::endl;
     }
 }
 
