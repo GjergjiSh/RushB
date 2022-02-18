@@ -2,7 +2,7 @@
 #define MODULEHANDLER_H
 
 #include "LogUtils.h"
-#include "Module.h"
+#include "ModuleInterface.h"
 #include <dlfcn.h>
 #include <filesystem>
 #include <iostream>

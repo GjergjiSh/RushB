@@ -1,4 +1,4 @@
-PRJ_PATH = -I./include
+PRJ_PATH = -I./include -I./ModuleInterface
 
 BUILD_PATH = ./bin
 
