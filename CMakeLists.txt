@@ -3,9 +3,14 @@ cmake_minimum_required(VERSION 3.16.3)
 project(control_center VERSION 1.0 DESCRIPTION "RushB Control Center")
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_CXX_FLAGS
-"${CMAKE_CXX_FLAGS} -O3 -O2 -std=c++17 -Wno-deprecated-declarations"
-)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -O2 -std=c++17 -Wno-deprecated-declarations")
+set(MODULES_DIR ${CMAKE_HOME_DIRECTORY}/RushBModules)
+
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_BINARY_DIR}/modules ${MODULES_DIR}/build)
+
+# if(NOT BUILD_MODULES)
+#     set(BUILD_MODULES 0)
+# endif()
 
 add_executable(ControlCenter .
     src/Main.cpp
@@ -34,3 +39,13 @@ add_custom_command(
                 ${CMAKE_SOURCE_DIR}/resources/Modules.xml
                 ${CMAKE_CURRENT_BINARY_DIR}/Modules.xml
 )
+
+if (BUILD_MODULES)
+add_custom_command(TARGET ControlCenter POST_BUILD
+  COMMAND  cd ${MODULES_DIR} && mkdir build && cd build && cmake .. && make
+)
+
+add_custom_command(TARGET ControlCenter POST_BUILD
+  COMMAND  find ${MODULES_DIR} -type f | grep -i so | xargs -i mv {} ${CMAKE_BINARY_DIR}/modules
+)
+endif()
