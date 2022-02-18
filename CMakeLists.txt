@@ -2,11 +2,12 @@ cmake_minimum_required(VERSION 3.16.3)
 
 project(control_center VERSION 1.0 DESCRIPTION "RushB Control Center")
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -O2 -std=c++17 -Wno-deprecated-declarations")
-set(MODULES_DIR ${CMAKE_HOME_DIRECTORY}/RushBModules)
 
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_BINARY_DIR}/modules ${MODULES_DIR}/build)
+add_subdirectory(modules)
+
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/avail_modules)
 
 add_executable(ControlCenter .
     src/Main.cpp
@@ -29,23 +30,17 @@ target_link_libraries(ControlCenter
 )
 
 add_custom_command(
-        TARGET ControlCenter POST_BUILD
-        COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/modules
+        TARGET ControlCenter PRE_BUILD
+        COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
 )
 
 add_custom_command(
-        TARGET ControlCenter POST_BUILD
+        TARGET ControlCenter PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_SOURCE_DIR}/resources/Modules.xml
-                ${CMAKE_CURRENT_BINARY_DIR}/Modules.xml
-)
-
-if (BUILD_MODULES)
-add_custom_command(TARGET ControlCenter POST_BUILD
-  COMMAND  cd ${MODULES_DIR} && mkdir -p build && cd build && cmake .. && make
+                ${CMAKE_SOURCE_DIR}/resources/ModuleConfig.xml
+                ${CMAKE_CURRENT_BINARY_DIR}/ModuleConfig.xml
 )
 
 add_custom_command(TARGET ControlCenter POST_BUILD
-  COMMAND  find ${MODULES_DIR} -type f | grep -i so | xargs -i mv {} ${CMAKE_BINARY_DIR}/modules
+  COMMAND  find ${CMAKE_CURRENT_BINARY_DIR}/modules -type f | grep -i so | xargs -i mv {} ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
 )
-endif()

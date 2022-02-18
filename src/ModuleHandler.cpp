@@ -97,7 +97,7 @@ int ModuleHandler::Register_Modules()
 {
     auto start = std::chrono::system_clock::now();
     // Iterate the available libraries in the lib folder
-    for (const auto & entry : std::filesystem::directory_iterator("./modules")) {
+    for (const auto & entry : std::filesystem::directory_iterator("./avail_modules")) {
         // Load the library
         void* lib_handle = dlopen(entry.path().c_str(), RTLD_LAZY);
         if (!lib_handle) {
