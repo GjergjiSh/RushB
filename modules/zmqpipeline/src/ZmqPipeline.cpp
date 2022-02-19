@@ -3,6 +3,16 @@
 ZmqPipeline::ZmqPipeline()
 {
     this->name = "ZmqPipeline";
+
+    publisher_funcs = {
+        std::make_pair("USS", &ZmqPipeline::Publish_Uss),
+        std::make_pair("SERVOS", &ZmqPipeline::Publish_Servos),
+    };
+
+    subscriber_funcs = {
+        std::make_pair("USS", &ZmqPipeline::Update_Uss),
+        std::make_pair("SERVOS", &ZmqPipeline::Update_Servos),
+    };
 }
 
 int ZmqPipeline::Init()
@@ -13,12 +23,18 @@ int ZmqPipeline::Init()
 
 int ZmqPipeline::Cycle_Step()
 {
-    std::string servo_values;
-    if (Serialized_Servos(servo_values) != 0)
-        return -1;
+    // Publish all pub topics and their data
+    std::string data;
+    for (auto topic : publisher_topics) {
+        if ((this->*publisher_funcs.at(topic))(topic) != 0)
+            return -1;
+    }
 
-    if (Send("SERVOS", servo_values) != 0)
-        return -1;
+    // Read all sub topics and update shared data
+    for (auto topic : subscriber_topics) {
+        if ((this->*subscriber_funcs.at(topic))() != 0)
+            return -1;
+    }
 
     return 0;
 }
@@ -38,11 +54,14 @@ int ZmqPipeline::Construct_Sockets()
         return -1;
     }
 
-    try { // Create the subscriber sockets
+    try { // Create the subscriber sockets and register the pub/sub topics
         for (auto parameter : parameters) {
-            if (parameter.first == "SUB_SOCKET") {
+            if (parameter.first == "SUB_TOPIC") {
                 subscribers.emplace(std::make_pair(parameter.second,
                     zmq::socket_t(zmq_context, zmq::socket_type::sub)));
+                subscriber_topics.push_back(parameter.second);
+            } else if (parameter.first == "PUB_TOPIC") {
+                publisher_topics.push_back(parameter.second);
             }
         }
     } catch (zmq::error_t& e) {
@@ -86,12 +105,9 @@ int ZmqPipeline::Init_Connection()
         return -1;
     }
 
-    if (Init_Endpoints() != 0)
-        return -1;
-    if (Construct_Sockets() != 0)
-        return -1;
-    if (Configure_Sockets() != 0)
-        return -1;
+    if (Init_Endpoints() != 0) return -1;
+    if (Construct_Sockets() != 0) return -1;
+    if (Configure_Sockets() != 0) return -1;
 
     return 0;
 }
@@ -140,21 +156,7 @@ int ZmqPipeline::Deinit_Connection()
 }
 
 
-int ZmqPipeline::Serialized_Servos(std::string& output_string)
-{
-    ServoValues_Proto proto_servos;
-    proto_servos.set_top_servo(shared_data->servos.top_servo);
-    proto_servos.set_right_servo(shared_data->servos.right_servo);
-    proto_servos.set_left_servo(shared_data->servos.left_servo);
-    if (!proto_servos.SerializeToString(&output_string)) {
-        LOG_ERROR("Failed to serialize servo values");
-        return -1;
-    }
-
-    return 0;
-}
-
-int ZmqPipeline::Send(const std::string topic, std::string data)
+int ZmqPipeline::Send(const std::string& topic, std::string& data)
 {
     try { // Init message and topic from parameter size
         zmq::message_t zmq_topic(topic.length());
@@ -179,32 +181,126 @@ int ZmqPipeline::Send(const std::string topic, std::string data)
     return 0;
 }
 
-int ZmqPipeline::Receive()
+int ZmqPipeline::Recv(const std::string& topic, std::string& data)
 {
     int recv = 0;
     zmq::message_t zmq_topic;
     zmq::message_t zmq_msg;
 
-    for (auto& [topic, socket] : subscribers) {
-        zmq::pollitem_t poll_item = { subscribers.at(topic), 0, ZMQ_POLLIN, 0 };
-        try {
-            zmq::poll(&poll_item, 1, 0);
+    zmq::pollitem_t poll_item = { subscribers.at(topic), 0, ZMQ_POLLIN, 0 };
+    try {
+        zmq::poll(&poll_item, 1, 0);
 
-            if (poll_item.revents & ZMQ_POLLIN) {
+        if (poll_item.revents & ZMQ_POLLIN) {
 
-                recv = subscribers.at(topic).recv(&zmq_topic, ZMQ_RCVMORE);
-                recv = subscribers.at(topic).recv(&zmq_msg) && recv;
+            recv = subscribers.at(topic).recv(&zmq_topic, ZMQ_RCVMORE);
+            recv = subscribers.at(topic).recv(&zmq_msg) && recv;
 
-                if (recv < 0) {
-                    LOG_WARNING("Failed to receive data!");
-                    return -1;
-                }
-            }
-        } catch (zmq::error_t& e) {
-            LOG_ERROR_DESCRIPTION("Failed to poll sockets", e.what());
-            return -1;
+            data.assign(static_cast<char*>(zmq_msg.data()), zmq_msg.size());
+
+            if (recv < 0)
+                LOG_WARNING("Failed to receive data!");
         }
+    } catch (zmq::error_t& e) {
+        LOG_ERROR_DESCRIPTION("Failed to poll sockets", e.what());
+        return -1;
     }
+
+    return 0;
+}
+
+int ZmqPipeline::Serialize_Servos(std::string& output_string)
+{
+    ServoValues_Proto proto_servos;
+    proto_servos.set_top_servo(shared_data->servos.top_servo);
+    proto_servos.set_right_servo(shared_data->servos.right_servo);
+    proto_servos.set_left_servo(shared_data->servos.left_servo);
+    if (!proto_servos.SerializeToString(&output_string)) {
+        LOG_ERROR("Failed to serialize servo values");
+        return -1;
+    }
+
+    return 0;
+}
+
+int ZmqPipeline::Serialize_Uss(std::string& output_string)
+{
+    UltraSonicValues_Proto proto_uss;
+    proto_uss.set_distance(shared_data->uss.distance);
+    if (!proto_uss.SerializeToString(&output_string)) {
+        LOG_ERROR("Failed to serialize servo values");
+        return -1;
+    }
+    return 0;
+}
+
+
+int ZmqPipeline::Deserialize_Uss(std::string& input_string, UltraSonicValues_Proto& uss)
+{
+    if (Recv("USS", input_string) != 0)
+        return -1;
+
+    if (!uss.ParseFromString(input_string)) {
+        LOG_ERROR("Failed to deserialize ultra sonic values");
+        return -1;
+    }
+
+    return 0;
+}
+
+int ZmqPipeline::Deserialize_Servos(std::string& input_string, ServoValues_Proto& servos)
+{
+    if (Recv("SERVOS", input_string) != 0)
+        return -1;
+
+    if (!servos.ParseFromString(input_string)) {
+        LOG_ERROR("Failed to deserialize servo values");
+        return -1;
+    }
+
+    return 0;
+}
+
+int ZmqPipeline::Publish_Servos(std::string& servos)
+{
+    if (Serialize_Servos(servos) != 0) return -1;
+    if (Send("SERVOS", servos) != 0) return -1;
+
+    return 0;
+}
+
+int ZmqPipeline::Publish_Uss(std::string& uss)
+{
+    if (Serialize_Uss(uss) != 0) return -1;
+    if (Send("USS", uss) != 0) return -1;
+
+    return 0;
+}
+
+int ZmqPipeline::Update_Uss()
+{
+    std::string serialized_uss;
+    UltraSonicValues_Proto uss;
+
+    if (Recv("USS", serialized_uss) == -1) return -1;
+    if (Deserialize_Uss(serialized_uss, uss) != 0) return -1;
+
+    shared_data->uss.distance = uss.distance();
+
+    return 0;
+}
+
+int ZmqPipeline::Update_Servos()
+{
+    std::string serialzed_servos;
+    ServoValues_Proto servos;
+
+    if (Recv("SERVOS", serialzed_servos) == -1) return -1;
+    if (Deserialize_Servos(serialzed_servos, servos) != 0) return -1;
+
+    shared_data->servos.left_servo = servos.left_servo();
+    shared_data->servos.right_servo = servos.right_servo();
+    shared_data->servos.top_servo = servos.top_servo();
 
     return 0;
 }

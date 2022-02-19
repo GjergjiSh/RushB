@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16.3)
 
-project(zmq_pipeline VERSION 1.0 DESCRIPTION "RushB zmq pipeline module")
+project(zmq_pipeline VERSION 2.0 DESCRIPTION "RushB zmq pipeline module")
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_FLAGS
@@ -8,6 +8,7 @@ set(CMAKE_CXX_FLAGS
 )
 
 set(MODULE_INTERFACE_DIR "../../include")
+set(CMAKE_CXX_STANDARD 17)
 
 add_library(ZmqPipeline SHARED .
     src/ZmqPipeline.cpp

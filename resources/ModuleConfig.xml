@@ -27,10 +27,9 @@
             <parameter name="REMOTE" value="127.0.0.1" />
             <parameter name="OUT_PORT" value="5554" />
             <parameter name="IN_PORT" value="5554" />
-            <parameter name="PUB_SOCKET" value="SERVOS" />
-            <parameter name="SUB_SOCKET" value="USS" />
+            <parameter name="PUB_TOPIC" value="SERVOS" />
+            <parameter name="SUB_TOPIC" value="USS" />
         </parameters>
     </module>
 
 </modules>
-
