@@ -32,15 +32,12 @@ target_link_libraries(ControlCenter
 add_custom_command(
         TARGET ControlCenter PRE_BUILD
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
-)
-
-add_custom_command(
-        TARGET ControlCenter PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
+         COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_SOURCE_DIR}/resources/ModuleConfig.xml
                 ${CMAKE_CURRENT_BINARY_DIR}/ModuleConfig.xml
 )
 
-add_custom_command(TARGET ControlCenter POST_BUILD
-  COMMAND  find ${CMAKE_CURRENT_BINARY_DIR}/modules -type f | grep -i so | xargs -i mv {} ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
+add_custom_target(avail_modules ALL
+    COMMAND  find ./modules -type f | grep -i so | xargs -i cp {} ./avail_modules
+    COMMENT Installing modules
 )
