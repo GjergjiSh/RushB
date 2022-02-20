@@ -7,7 +7,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -O2 -std=c++17 -Wno-deprecated-decla
 
 add_subdirectory(modules)
 
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ./avail_modules)
+if(BUILD_EXAMPLES)
+    add_subdirectory(example-modules)
+endif()
+
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
+    ${CMAKE_CURRENT_BINARY_DIR}/example-modules
+)
 
 add_executable(ControlCenter .
     src/Main.cpp
@@ -21,7 +28,6 @@ set_target_properties(ControlCenter PROPERTIES
 
 target_include_directories(ControlCenter PRIVATE .
     include
-    ModuleInterface
 )
 
 target_link_libraries(ControlCenter
@@ -30,15 +36,18 @@ target_link_libraries(ControlCenter
     -pthread
 )
 
-add_custom_command(
-        TARGET ControlCenter PRE_BUILD
+add_custom_command( TARGET ControlCenter PRE_BUILD
+        COMMENT echo "Setting up control center directories"
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
+        COMMENT echo "Setting up control center module configuration"
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_SOURCE_DIR}/resources/ModuleConfig.xml
                 ${CMAKE_CURRENT_BINARY_DIR}/ModuleConfig.xml
 )
 
-add_custom_target(avail_modules ALL
-    COMMAND  find ./modules -type f | grep -i so | xargs -i cp {} ./avail_modules
-    COMMENT Installing modules
+add_custom_target(install_modules ALL
+        COMMENT echo "Installing Example Modules"
+        COMMAND  find ${CMAKE_CURRENT_BINARY_DIR}/example-modules -type f | grep -i so | xargs -i cp {} ${CMAKE_CURRENT_BINARY_DIR}/example-modules
+        COMMENT echo "Installing Modules"
+        COMMAND  find ${CMAKE_CURRENT_BINARY_DIR}/modules -type f | grep -i so | xargs -i cp {} ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
 )
