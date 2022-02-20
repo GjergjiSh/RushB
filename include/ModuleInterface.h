@@ -4,6 +4,8 @@
 #include <iostream>
 #include <unordered_map>
 
+#define IMAGE_1920X1080_R8G8B8 (1920 * 1080 * 3)
+
 typedef struct {
     int top_servo;
     int right_servo;
@@ -14,10 +16,18 @@ typedef struct {
     float distance;
 } UltraSonicValues_t;
 
+typedef unsigned char ImageFrame_t[IMAGE_1920X1080_R8G8B8];
+
+typedef struct {
+    ImageFrame_t frame;
+} VideoData_t;
+
 typedef struct {
     ServoValues_t servos;
     UltraSonicValues_t uss;
+    VideoData_t video;
 } SharedData_t;
+
 
 class Module {
 public:

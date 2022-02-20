@@ -47,6 +47,37 @@ static void Pad_Callback(GstElement* element, GstPad* pad, gpointer data)
     g_free(name);
 }
 
+static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_sub)
+{
+    GstSample* sample;
+    g_signal_emit_by_name(sink, "pull-sample", &sample);
+    if (sample) {
+        GstBuffer* buffer = gst_sample_get_buffer(sample);
+        if (!buffer) {
+            LOG_ERROR("gst_sample_get_buffer() returned NULL");
+            return GST_FLOW_OK;
+        }
+        GstMapInfo map;
+        if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+            LOG_ERROR("gst_buffer_map() failed");
+            return GST_FLOW_OK;
+        }
+        if (!map.data) {
+            LOG_ERROR("gst_buffer had NULL data pointer");
+            return GST_FLOW_OK;
+        }
+
+        video_sub->video_mutex.lock();
+        memcpy(video_sub->shared_data->video.frame, map.data, sizeof(video_sub->shared_data->video.frame));
+        video_sub->video_mutex.unlock();
+
+        gst_buffer_unmap(buffer, &map);
+        gst_sample_unref(sample);
+
+        return GST_FLOW_OK;
+    }
+    return GST_FLOW_OK;
+}
 
 VideoSub::VideoSub() {
     this->name="VideoSub";
@@ -97,7 +128,7 @@ int VideoSub::Create_Elements()
     pipeline->decodebin = gst_element_factory_make("decodebin", NULL);
     pipeline->videoconvert = gst_element_factory_make("videoconvert", NULL);
     pipeline->queue = gst_element_factory_make("queue", NULL);
-    pipeline->autovideosink = gst_element_factory_make("autovideosink", NULL);
+    pipeline->videosink = gst_element_factory_make("appsink", NULL);
 
     if (!pipeline->pipe ||
         !pipeline->udpsrc ||
@@ -106,7 +137,7 @@ int VideoSub::Create_Elements()
         !pipeline->decodebin ||
         !pipeline->videoconvert ||
         !pipeline->queue ||
-        !pipeline->autovideosink) {
+        !pipeline->videosink) {
         LOG_ERROR("Failed to create all pipeline elements");
 
         delete pipeline;
@@ -121,7 +152,7 @@ int VideoSub::Create_Elements()
         pipeline->decodebin,
         pipeline->videoconvert,
         pipeline->queue,
-        pipeline->autovideosink, NULL);
+        pipeline->videosink, NULL);
 
     return 0;
 }
@@ -141,8 +172,11 @@ int VideoSub::Configure_Elements()
     //Register Callbacks
     g_signal_connect(pipeline->decodebin, "pad-added", G_CALLBACK(Pad_Callback), pipeline->videoconvert);
     GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline->pipe));
+
     gst_bus_add_signal_watch(bus);
     g_signal_connect(bus, "message", (GCallback)Bus_Message_Callback, pipeline->pipe);
+
+    g_signal_connect(pipeline->videosink, "pull-sample", (GCallback)Update_Shared_Video_Data, this);
 
     return 0;
 }
@@ -166,7 +200,7 @@ int VideoSub::Link_Elements()
     if (!gst_element_link_many(
             pipeline->videoconvert,
             pipeline->queue,
-            pipeline->autovideosink, NULL)) {
+            pipeline->videosink, NULL)) {
         LOG_ERROR("Failed to link second branch of pipeline elements");
 
         delete pipeline;
@@ -184,7 +218,7 @@ int VideoSub::Destroy_Elements()
     gst_object_unref(pipeline->rtph264depay);
     gst_object_unref(pipeline->decodebin);
     gst_object_unref(pipeline->queue);
-    gst_object_unref(pipeline->autovideosink);
+    gst_object_unref(pipeline->videosink);
     return 0;
 }
 

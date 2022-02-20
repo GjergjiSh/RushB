@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16.3)
 
-project(VideoSub VERSION 0.1 DESCRIPTION "RushB VideoSub module")
+project(VideoSub VERSION 0.2 DESCRIPTION "RushB VideoSub module")
 
 find_package (Threads)
 

@@ -2,6 +2,7 @@
 
 #include <gst/gst.h>
 #include <thread>
+#include <mutex>
 
 #define LOG_INFO(msg) \
     std::cout << "[I][VideoSub] " << msg << std::endl;
@@ -25,6 +26,8 @@
     autovideosink
 
  ****************************************************************************************/
+typedef void (*ReceivedSample_t)(const void *const data, const size_t size);
+
 typedef struct
 {
     GstElement* pipe;
@@ -34,7 +37,8 @@ typedef struct
     GstElement* decodebin;
     GstElement* videoconvert;
     GstElement* queue;
-    GstElement* autovideosink;
+    GstElement* videosink;
+    ReceivedSample_t Received_Sample;
 } VideoPipeline_t;
 
 class VideoSub : public Module {
@@ -44,6 +48,8 @@ public:
     int Init(void) override;
     int Cycle_Step(void) override;
     int Deinit(void) override;
+
+    std::mutex video_mutex;
 
 private:
     int Construct_Pipeline();
