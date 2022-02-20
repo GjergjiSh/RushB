@@ -55,7 +55,6 @@ private:
     int Set_Pipeline_State_Playing();
     void Start_Gloop();
 
-    int port;
     VideoPipeline_t* pipeline;
     GMainLoop* loop;
     std::thread video_thread;
