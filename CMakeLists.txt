@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -O2 -std=c++17 -Wno-deprecated-decla
 
 add_subdirectory(modules)
 
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/avail_modules)
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ./avail_modules)
 
 add_executable(ControlCenter .
     src/Main.cpp
@@ -27,12 +27,13 @@ target_include_directories(ControlCenter PRIVATE .
 target_link_libraries(ControlCenter
     -lpugixml
     ${CMAKE_DL_LIBS}
+    -pthread
 )
 
 add_custom_command(
         TARGET ControlCenter PRE_BUILD
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
-         COMMAND ${CMAKE_COMMAND} -E copy
+        COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_SOURCE_DIR}/resources/ModuleConfig.xml
                 ${CMAKE_CURRENT_BINARY_DIR}/ModuleConfig.xml
 )

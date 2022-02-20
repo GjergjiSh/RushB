@@ -8,27 +8,33 @@
             <parameter name="RIGHT_SERVO" value="20" />
             <parameter name="LEFT_SERVO" value="30" />
         </parameters>
-    </module>
+    </module> -->
 
-    <module name="Reader">
+    <!-- <module name="Reader">
         <parameters>
             <parameter name="HELLO" value="Reader says Hello World :)" />
         </parameters>
-    </module>
+    </module> -->
 
-    <module name="Controller">
+    <!-- <module name="Controller">
         <parameters>
             <parameter name="DEVICE_PATH" value="/dev/input/by-id/usb-Inno_GamePad.._Inno_GamePad.._0000001-joystick" />
         </parameters>
     </module> -->
 
-    <module name="ZmqPipeline">
+    <!-- <module name="ZmqPipeline">
         <parameters>
             <parameter name="REMOTE" value="127.0.0.1" />
             <parameter name="OUT_PORT" value="5554" />
             <parameter name="IN_PORT" value="5554" />
             <parameter name="PUB_TOPIC" value="SERVOS" />
             <parameter name="SUB_TOPIC" value="USS" />
+        </parameters>
+    </module> -->
+
+    <module name="VideoSub">
+        <parameters>
+            <parameter name="IN_PORT" value="5553" />
         </parameters>
     </module>
 
