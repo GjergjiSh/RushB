@@ -25,8 +25,8 @@
     <!-- <module name="ZmqPipeline">
         <parameters>
             <parameter name="REMOTE" value="127.0.0.1" />
-            <parameter name="OUT_PORT" value="5554" />
-            <parameter name="IN_PORT" value="5554" />
+            <parameter name="OUT_PORT" value="5001" />
+            <parameter name="IN_PORT" value="5002" />
             <parameter name="PUB_TOPIC" value="SERVOS" />
             <parameter name="SUB_TOPIC" value="USS" />
         </parameters>
@@ -34,7 +34,7 @@
 
     <!-- <module name="VideoSub">
         <parameters>
-            <parameter name="IN_PORT" value="5553" />
+            <parameter name="IN_PORT" value="5003" />
         </parameters>
     </module> -->
 
@@ -43,7 +43,7 @@
             <parameter name="CAMERA_INDEX" value="/dev/video0" />
             <parameter name="BITRATE" value="2000" />
             <parameter name="REMOTE_HOST" value="127.0.0.1" />
-            <parameter name="OUT_PORT" value="5553" />
+            <parameter name="OUT_PORT" value="5004" />
         </parameters>
     </module> -->
 
