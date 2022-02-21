@@ -6,28 +6,37 @@
 
 #define IMAGE_1920X1080_R8G8B8 (1920 * 1080 * 3)
 
+#pragma pack(push, 1)
 typedef struct {
     int top_servo;
     int right_servo;
     int left_servo;
 } ServoValues_t;
+#pragma pack(pop)
 
+#pragma pack(push, 1)
 typedef struct {
     float distance;
 } UltraSonicValues_t;
+#pragma pack(pop)
 
+#pragma pack(push, 1)
 typedef unsigned char ImageFrame_t[IMAGE_1920X1080_R8G8B8];
+#pragma pack(pop)
 
+#pragma pack(push, 1)
 typedef struct {
     ImageFrame_t frame;
 } VideoData_t;
+#pragma pack(pop)
 
+#pragma pack(push, 1)
 typedef struct {
     ServoValues_t servos;
     UltraSonicValues_t uss;
     VideoData_t video;
 } SharedData_t;
-
+#pragma pack(pop)
 
 class Module {
 public:

@@ -31,12 +31,12 @@ target_include_directories(ControlCenter PRIVATE .
 )
 
 target_link_libraries(ControlCenter
-    -lpugixml
     ${CMAKE_DL_LIBS}
+    -lpugixml
     -pthread
 )
 
-add_custom_command( TARGET ControlCenter PRE_BUILD
+add_custom_command( TARGET ControlCenter POST_BUILD
         COMMENT echo "Setting up control center directories"
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
         COMMENT echo "Setting up control center module configuration"

@@ -32,10 +32,15 @@
         </parameters>
     </module> -->
 
-    <module name="VideoSub">
+    <!-- <module name="VideoSub">
         <parameters>
             <parameter name="IN_PORT" value="5553" />
         </parameters>
-    </module>
+    </module> -->
+
+    <!-- <module name="VideoPlayer">
+        <parameters>
+        </parameters>
+    </module> -->
 
 </modules>
