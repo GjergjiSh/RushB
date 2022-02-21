@@ -1,5 +1,11 @@
 #include "VideoPlayer.h"
+<<<<<<< HEAD
 #include<unistd.h>
+=======
+#include <unistd.h>
+
+cv::Mat frame;
+>>>>>>> debug
 
 VideoPlayer::VideoPlayer()
 {
@@ -9,7 +15,6 @@ VideoPlayer::VideoPlayer()
 int VideoPlayer::Init()
 {
     LOG_INFO("Initializing...");
-    XInitThreads();
     cv::namedWindow("Video Viewer");
 
     return 0;
@@ -17,11 +22,10 @@ int VideoPlayer::Init()
 
 int VideoPlayer::Cycle_Step()
 {
-    cv::Mat frame(480, 640, CV_8UC1, this->shared_data->video.frame);
+    frame= cv::Mat(480, 640, CV_8UC1, this->shared_data->video.frame);
     if (frame.data) {
-
         cv::imshow("Video Viewer", frame);
-        //cv::cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
+        cv::waitKey(1);
     }
 
     return 0;

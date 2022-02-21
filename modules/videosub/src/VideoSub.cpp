@@ -69,9 +69,9 @@ static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_
         }
 
        std::scoped_lock<std::mutex> lock(video_sub->video_mutex); {
-            memcpy(video_sub->shared_data->video.frame, map.data, map.size);
-            gst_buffer_unmap(buffer, &map);
-            gst_sample_unref(sample);
+           memcpy(video_sub->shared_data->video.frame, map.data, map.size);
+           gst_buffer_unmap(buffer, &map);
+           gst_sample_unref(sample);
        }
     }
     return GST_FLOW_OK;
@@ -90,7 +90,6 @@ int VideoSub::Init()
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;
 
-    Start_Gloop();
     return 0;
 }
 
@@ -212,26 +211,17 @@ int VideoSub::Link_Elements()
     return 0;
 }
 
-int VideoSub::Destroy_Elements()
-{
-    gst_object_unref(pipeline->pipe);
-    gst_object_unref(pipeline->udpsrc);
-    gst_object_unref(pipeline->filter);
-    gst_object_unref(pipeline->rtph264depay);
-    gst_object_unref(pipeline->decodebin);
-    gst_object_unref(pipeline->queue);
-    gst_object_unref(pipeline->videosink);
-    return 0;
-}
-
 int VideoSub::Destroy_Pipeline()
 {
-    gst_element_set_state(pipeline->pipe, GST_STATE_NULL);
-    g_main_loop_quit(loop);
-    video_thread.join();
-    delete pipeline;
+    GstStateChangeReturn ret = gst_element_set_state(pipeline->pipe, GST_STATE_NULL);
+    if (ret == GST_STATE_CHANGE_FAILURE) {
+        LOG_ERROR("Failed to destroy the video pipeline");
+        delete pipeline;
+        return -1;
+    }
 
     LOG_INFO("Subscriber video pipeline destroyed");
+    delete pipeline;
     return 0;
 }
 
@@ -248,13 +238,6 @@ int VideoSub::Set_Pipeline_State_Playing()
 
     LOG_INFO("Video pipeline set to playing");
     return 0;
-}
-
-void VideoSub::Start_Gloop()
-{
-    //Start the the main loop
-    loop = g_main_loop_new(NULL, FALSE);
-    video_thread = std::thread(g_main_loop_run, loop);
 }
 
 extern "C" Module* Create() { return new VideoSub;}

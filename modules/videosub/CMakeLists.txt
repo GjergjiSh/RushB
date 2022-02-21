@@ -38,5 +38,4 @@ target_link_libraries(VideoSub
     -lgobject-2.0
     -lglib-2.0
     -lgstapp-1.0
-
 )
