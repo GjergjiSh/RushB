@@ -123,7 +123,8 @@ int VideoSub::Create_Elements()
     pipeline->filter = gst_element_factory_make("capsfilter", NULL);
     pipeline->rtph264depay = gst_element_factory_make("rtph264depay", NULL);
     pipeline->decodebin = gst_element_factory_make("decodebin", NULL);
-    pipeline->videoconvert = gst_element_factory_make("autovideoconvert", NULL);
+    pipeline->videoconvert = gst_element_factory_make("videoconvert", NULL);
+    pipeline->convert_filter = gst_element_factory_make("capsfilter", NULL);
     pipeline->queue = gst_element_factory_make("queue", NULL);
     pipeline->videosink = gst_element_factory_make("appsink", NULL);
 
@@ -133,6 +134,7 @@ int VideoSub::Create_Elements()
         !pipeline->rtph264depay ||
         !pipeline->decodebin ||
         !pipeline->videoconvert ||
+        !pipeline->convert_filter ||
         !pipeline->queue ||
         !pipeline->videosink) {
         LOG_ERROR("Failed to create all pipeline elements");
@@ -148,6 +150,7 @@ int VideoSub::Create_Elements()
         pipeline->rtph264depay,
         pipeline->decodebin,
         pipeline->videoconvert,
+        pipeline->convert_filter,
         pipeline->queue,
         pipeline->videosink, NULL);
 
@@ -162,9 +165,15 @@ int VideoSub::Configure_Elements()
         "encoding-name", G_TYPE_STRING, "H264",
         "payload", G_TYPE_INT, 96, NULL);
 
+    GstCaps* convert_caps = gst_caps_new_simple("video/x-raw",
+            "format", G_TYPE_STRING, "RGB", NULL);
+
     g_object_set(G_OBJECT(pipeline->udpsrc), "port", std::stoi(parameters.at("IN_PORT")), NULL);
     g_object_set(G_OBJECT(pipeline->filter), "caps", caps, NULL);
+    g_object_set(G_OBJECT(pipeline->convert_filter), "caps", convert_caps, NULL);
     gst_caps_unref(caps);
+    gst_caps_unref(convert_caps);
+
 
     //Register Callbacks
     g_signal_connect(pipeline->decodebin, "pad-added", G_CALLBACK(Pad_Callback), pipeline->videoconvert);
@@ -198,6 +207,7 @@ int VideoSub::Link_Elements()
     //Link videoconvert through to videosink
     if (!gst_element_link_many(
             pipeline->videoconvert,
+            pipeline->convert_filter,
             pipeline->queue,
             pipeline->videosink, NULL)) {
         LOG_ERROR("Failed to link second branch of pipeline elements");

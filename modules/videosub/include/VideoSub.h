@@ -36,6 +36,7 @@ typedef struct
     GstElement* decodebin;
     GstElement* videoconvert;
     GstElement* queue;
+    GstElement* convert_filter;
     GstElement* videosink;
     ReceivedSample_t Received_Sample;
 } VideoPipeline_t;

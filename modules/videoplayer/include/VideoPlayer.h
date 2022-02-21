@@ -26,5 +26,6 @@ public:
     int Cycle_Step(void) override;
     int Deinit(void) override;
 private:
-    cv::Mat frame;
+    cv::Mat frame_bgr;
+    cv::Mat frame_rgb;
 };

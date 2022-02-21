@@ -16,9 +16,10 @@ int VideoPlayer::Init()
 
 int VideoPlayer::Cycle_Step()
 {
-    frame= cv::Mat(480, 640, CV_8UC1, this->shared_data->video.frame);
-    if (frame.data) {
-        cv::imshow("Video Viewer", frame);
+    frame_bgr= cv::Mat(480, 640, CV_8UC3, (void *)this->shared_data->video.frame);
+    if (frame_bgr.data) {
+        cv::cvtColor(frame_bgr, frame_rgb, cv::COLOR_RGB2BGR);
+        cv::imshow("Video Viewer", frame_rgb);
         cv::waitKey(1);
     }
 
