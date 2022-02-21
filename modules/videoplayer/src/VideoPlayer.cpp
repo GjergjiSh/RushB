@@ -1,11 +1,5 @@
 #include "VideoPlayer.h"
-<<<<<<< HEAD
-#include<unistd.h>
-=======
-#include <unistd.h>
 
-cv::Mat frame;
->>>>>>> debug
 
 VideoPlayer::VideoPlayer()
 {

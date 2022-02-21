@@ -85,8 +85,6 @@ int VideoSub::Init()
 {
     LOG_INFO("Initializing...");
 
-    XInitThreads();
-
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;
 
@@ -125,7 +123,7 @@ int VideoSub::Create_Elements()
     pipeline->filter = gst_element_factory_make("capsfilter", NULL);
     pipeline->rtph264depay = gst_element_factory_make("rtph264depay", NULL);
     pipeline->decodebin = gst_element_factory_make("decodebin", NULL);
-    pipeline->videoconvert = gst_element_factory_make("videoconvert", NULL);
+    pipeline->videoconvert = gst_element_factory_make("autovideoconvert", NULL);
     pipeline->queue = gst_element_factory_make("queue", NULL);
     pipeline->videosink = gst_element_factory_make("appsink", NULL);
 
