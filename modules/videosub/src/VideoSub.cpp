@@ -3,6 +3,9 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <X11/Xlib.h>
+
+cv::Mat frame;
 
 static GstBusSyncReply Bus_Message_Callback(GstBus* bus, GstMessage* message, gpointer pipeline)
 {
@@ -73,13 +76,15 @@ static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_
             return GST_FLOW_OK;
         }
 
-       std::scoped_lock<std::mutex> lock(video_sub->video_mutex); {
+    //   std::scoped_lock<std::mutex> lock(video_sub->video_mutex); {
             memcpy(video_sub->shared_data->video.frame, map.data, map.size);
 
-       cv::Mat frame(480, 640, CV_8UC1, video_sub->shared_data->video.frame);
+       //cv::Mat frame();
+       frame = cv::Mat(480, 640, CV_8UC1, video_sub->shared_data->video.frame);
   //  if (frame.data) {
 
         cv::imshow("Video Viewer", frame);
+        //cv::waitKey(1);
         //LOG_INFO("Frame inc");
         //cv::cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
    // }
@@ -87,8 +92,8 @@ static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_
         gst_buffer_unmap(buffer, &map);
         gst_sample_unref(sample);
 
-        return GST_FLOW_OK;
-       }
+        //return GST_FLOW_OK;
+  //     }
 
     }
     return GST_FLOW_OK;
@@ -101,6 +106,8 @@ VideoSub::VideoSub() {
 int VideoSub::Init()
 {
     LOG_INFO("Initializing...");
+
+    XInitThreads();
 
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;

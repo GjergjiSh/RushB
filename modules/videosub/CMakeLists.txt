@@ -41,5 +41,6 @@ target_link_libraries(VideoSub
     -lglib-2.0
     -lgstapp-1.0
     ${OpenCV_LIBS}
+    ${CMAKE_DL_LIBS}
 
 )
