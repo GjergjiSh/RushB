@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.16.3)
 
-project(VideoSub VERSION 0.2 DESCRIPTION "RushB VideoSub module")
+project(VideoSub VERSION 1.0 DESCRIPTION "RushB VideoSub module")
 
 find_package (Threads)
+find_package( OpenCV REQUIRED )
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_FLAGS
@@ -23,15 +24,22 @@ set_target_properties(VideoSub PROPERTIES
 target_include_directories(VideoSub PRIVATE .
     include
     ${MODULE_INTERFACE_DIR}
+    ${OpenCV_INCLUDE_DIRS}
     /usr/include/gstreamer-1.0
     /usr/include/glib-2.0
     /usr/lib/x86_64-linux-gnu/glib-2.0/include
 )
 
+link_directories(
+    /usr/local/lib
+)
+
 target_link_libraries(VideoSub
+    ${OpenCV_LIBS}
+    Threads::Threads
     -lgstreamer-1.0
     -lgobject-2.0
     -lglib-2.0
     -lgstapp-1.0
-    Threads::Threads
+
 )

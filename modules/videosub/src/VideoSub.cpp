@@ -41,11 +41,12 @@ static void Pad_Callback(GstElement* element, GstPad* pad, gpointer data)
     video_convert = GST_ELEMENT(data);
 
     if (!gst_element_link_pads(element, name, video_convert, "sink")) {
-        g_printerr("[E][VideoPipeline] Failed to link decidebin and autoconvert \n");
+        LOG_ERROR("Failed to link decidebin and autoconvert")
     }
 
     g_free(name);
 }
+
 
 static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_sub)
 {
@@ -67,9 +68,9 @@ static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_
             return GST_FLOW_OK;
         }
 
-        video_sub->video_mutex.lock();
-        memcpy(video_sub->shared_data->video.frame, map.data, sizeof(video_sub->shared_data->video.frame));
-        video_sub->video_mutex.unlock();
+       std::scoped_lock<std::mutex> lock(video_sub->video_mutex); {
+            memcpy(video_sub->shared_data->video.frame, map.data, map.size);
+       }
 
         gst_buffer_unmap(buffer, &map);
         gst_sample_unref(sample);
@@ -86,6 +87,7 @@ VideoSub::VideoSub() {
 int VideoSub::Init()
 {
     LOG_INFO("Initializing...");
+
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;
 
@@ -95,7 +97,6 @@ int VideoSub::Init()
 
 int VideoSub::Cycle_Step()
 {
-
     return 0;
 }
 
@@ -176,7 +177,9 @@ int VideoSub::Configure_Elements()
     gst_bus_add_signal_watch(bus);
     g_signal_connect(bus, "message", (GCallback)Bus_Message_Callback, pipeline->pipe);
 
-    g_signal_connect(pipeline->videosink, "pull-sample", (GCallback)Update_Shared_Video_Data, this);
+    //g_signal_connect(pipeline->videosink, "pull-sample", (GCallback)Update_Shared_Video_Data, this);
+    g_object_set(G_OBJECT(pipeline->videosink), "emit-signals", TRUE, "sync", FALSE, NULL);
+    g_signal_connect(pipeline->videosink, "new-sample", G_CALLBACK(Update_Shared_Video_Data), this);
 
     return 0;
 }
