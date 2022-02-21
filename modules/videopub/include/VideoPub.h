@@ -14,6 +14,19 @@
 #define LOG_ERROR(msg) \
     std::cerr << "[E][VideoPub] " << msg << std::endl;
 
+
+
+/**************************************    Pipeline    *********************************
+
+    gst-launch-1.0 -v v4l2src device=/dev/video0 ! \
+    videoconvert ! \
+    x264enc tune=zerolatency bitrate=2000 speed-preset=ultrafast ! \
+    rtph264pay ! \
+    udpsink host=xxxx.xx.xx.xx port=xxxx
+
+ ****************************************************************************************/
+
+
 typedef struct
 {
     GstElement* pipe;

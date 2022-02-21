@@ -17,7 +17,7 @@
 
 /**************************************    Pipeline    *********************************
 
-    gst-launch-1.0 -v udpsrc port=xxxx ! \
+    gst-launch-1.0 -v udpsrc port=5553 ! \
    "application/x-rtp, media=video, clock-rate=90000, encoding-name=H264, payload=96" ! \
     rtph264depay ! \
     decodebin ! \

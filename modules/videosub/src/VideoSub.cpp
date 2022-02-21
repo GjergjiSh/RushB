@@ -1,5 +1,9 @@
 #include "VideoSub.h"
 
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
 static GstBusSyncReply Bus_Message_Callback(GstBus* bus, GstMessage* message, gpointer pipeline)
 {
     switch (GST_MESSAGE_TYPE(message)) {
@@ -50,6 +54,7 @@ static void Pad_Callback(GstElement* element, GstPad* pad, gpointer data)
 
 static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_sub)
 {
+    LOG_INFO("X");
     GstSample* sample;
     g_signal_emit_by_name(sink, "pull-sample", &sample);
     if (sample) {
@@ -70,12 +75,21 @@ static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_
 
        std::scoped_lock<std::mutex> lock(video_sub->video_mutex); {
             memcpy(video_sub->shared_data->video.frame, map.data, map.size);
-       }
+
+       cv::Mat frame(480, 640, CV_8UC1, video_sub->shared_data->video.frame);
+  //  if (frame.data) {
+
+        cv::imshow("Video Viewer", frame);
+        //LOG_INFO("Frame inc");
+        //cv::cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
+   // }
 
         gst_buffer_unmap(buffer, &map);
         gst_sample_unref(sample);
 
         return GST_FLOW_OK;
+       }
+
     }
     return GST_FLOW_OK;
 }

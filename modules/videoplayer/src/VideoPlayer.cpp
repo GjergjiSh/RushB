@@ -1,6 +1,6 @@
 #include "VideoPlayer.h"
-#include<unistd.h>
 #include <X11/Xlib.h>
+#include <unistd.h>
 
 VideoPlayer::VideoPlayer()
 {
@@ -22,6 +22,7 @@ int VideoPlayer::Cycle_Step()
     if (frame.data) {
 
         cv::imshow("Video Viewer", frame);
+        //LOG_INFO("Frame inc");
         //cv::cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
     }
 
