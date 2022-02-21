@@ -4,6 +4,8 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <X11/Xlib.h>
+
 
 #define LOG_INFO(msg) \
     std::cout << "[I][VideoPlayer] " << msg << std::endl;

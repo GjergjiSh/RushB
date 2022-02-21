@@ -3,6 +3,8 @@
 #include <gst/gst.h>
 #include <thread>
 #include <mutex>
+#include <X11/Xlib.h>
+
 
 #define LOG_INFO(msg) \
     std::cout << "[I][VideoSub] " << msg << std::endl;

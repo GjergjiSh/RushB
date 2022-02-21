@@ -56,26 +56,23 @@ static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_
         GstBuffer* buffer = gst_sample_get_buffer(sample);
         if (!buffer) {
             LOG_ERROR("gst_sample_get_buffer() returned NULL");
-            return GST_FLOW_OK;
+            return GST_FLOW_ERROR;
         }
         GstMapInfo map;
         if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
             LOG_ERROR("gst_buffer_map() failed");
-            return GST_FLOW_OK;
+            return GST_FLOW_ERROR;
         }
         if (!map.data) {
             LOG_ERROR("gst_buffer had NULL data pointer");
-            return GST_FLOW_OK;
+            return GST_FLOW_ERROR;
         }
 
        std::scoped_lock<std::mutex> lock(video_sub->video_mutex); {
             memcpy(video_sub->shared_data->video.frame, map.data, map.size);
+            gst_buffer_unmap(buffer, &map);
+            gst_sample_unref(sample);
        }
-
-        gst_buffer_unmap(buffer, &map);
-        gst_sample_unref(sample);
-
-        return GST_FLOW_OK;
     }
     return GST_FLOW_OK;
 }
@@ -87,6 +84,8 @@ VideoSub::VideoSub() {
 int VideoSub::Init()
 {
     LOG_INFO("Initializing...");
+
+    XInitThreads();
 
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;

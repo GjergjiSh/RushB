@@ -1,6 +1,5 @@
 #include "VideoPlayer.h"
 #include<unistd.h>
-#include <X11/Xlib.h>
 
 VideoPlayer::VideoPlayer()
 {
