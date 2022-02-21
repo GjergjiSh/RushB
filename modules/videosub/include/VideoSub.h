@@ -1,7 +1,6 @@
 #include "ModuleInterface.h"
 
 #include <gst/gst.h>
-#include <thread>
 #include <mutex>
 
 #define LOG_INFO(msg) \
@@ -62,6 +61,4 @@ private:
     void Start_Gloop();
 
     VideoPipeline_t* pipeline;
-    GMainLoop* loop;
-    std::thread video_thread;
 };

@@ -1,12 +1,5 @@
 #include "VideoSub.h"
 
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <X11/Xlib.h>
-
-cv::Mat frame;
-
 static GstBusSyncReply Bus_Message_Callback(GstBus* bus, GstMessage* message, gpointer pipeline)
 {
     switch (GST_MESSAGE_TYPE(message)) {
@@ -57,7 +50,6 @@ static void Pad_Callback(GstElement* element, GstPad* pad, gpointer data)
 
 static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_sub)
 {
-    LOG_INFO("X");
     GstSample* sample;
     g_signal_emit_by_name(sink, "pull-sample", &sample);
     if (sample) {
@@ -76,25 +68,11 @@ static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_
             return GST_FLOW_OK;
         }
 
-    //   std::scoped_lock<std::mutex> lock(video_sub->video_mutex); {
-            memcpy(video_sub->shared_data->video.frame, map.data, map.size);
-
-       //cv::Mat frame();
-       frame = cv::Mat(480, 640, CV_8UC1, video_sub->shared_data->video.frame);
-  //  if (frame.data) {
-
-        cv::imshow("Video Viewer", frame);
-        //cv::waitKey(1);
-        //LOG_INFO("Frame inc");
-        //cv::cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
-   // }
-
-        gst_buffer_unmap(buffer, &map);
-        gst_sample_unref(sample);
-
-        //return GST_FLOW_OK;
-  //     }
-
+       std::scoped_lock<std::mutex> lock(video_sub->video_mutex); {
+           memcpy(video_sub->shared_data->video.frame, map.data, map.size);
+           gst_buffer_unmap(buffer, &map);
+           gst_sample_unref(sample);
+       }
     }
     return GST_FLOW_OK;
 }
@@ -107,12 +85,9 @@ int VideoSub::Init()
 {
     LOG_INFO("Initializing...");
 
-    XInitThreads();
-
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;
 
-    Start_Gloop();
     return 0;
 }
 
@@ -234,26 +209,17 @@ int VideoSub::Link_Elements()
     return 0;
 }
 
-int VideoSub::Destroy_Elements()
-{
-    gst_object_unref(pipeline->pipe);
-    gst_object_unref(pipeline->udpsrc);
-    gst_object_unref(pipeline->filter);
-    gst_object_unref(pipeline->rtph264depay);
-    gst_object_unref(pipeline->decodebin);
-    gst_object_unref(pipeline->queue);
-    gst_object_unref(pipeline->videosink);
-    return 0;
-}
-
 int VideoSub::Destroy_Pipeline()
 {
-    gst_element_set_state(pipeline->pipe, GST_STATE_NULL);
-    g_main_loop_quit(loop);
-    video_thread.join();
-    delete pipeline;
+    GstStateChangeReturn ret = gst_element_set_state(pipeline->pipe, GST_STATE_NULL);
+    if (ret == GST_STATE_CHANGE_FAILURE) {
+        LOG_ERROR("Failed to destroy the video pipeline");
+        delete pipeline;
+        return -1;
+    }
 
     LOG_INFO("Subscriber video pipeline destroyed");
+    delete pipeline;
     return 0;
 }
 
@@ -270,13 +236,6 @@ int VideoSub::Set_Pipeline_State_Playing()
 
     LOG_INFO("Video pipeline set to playing");
     return 0;
-}
-
-void VideoSub::Start_Gloop()
-{
-    //Start the the main loop
-    loop = g_main_loop_new(NULL, FALSE);
-    video_thread = std::thread(g_main_loop_run, loop);
 }
 
 extern "C" Module* Create() { return new VideoSub;}
