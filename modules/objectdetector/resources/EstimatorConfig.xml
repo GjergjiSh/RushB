@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Config>
+    <KnownObjects>
+        <KnownObject id = "1" name = "Person" height= "177" width = "60"/>
+    </KnownObjects>
+</Config>

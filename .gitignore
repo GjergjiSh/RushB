@@ -14,3 +14,4 @@ misc
 *.lot
 workspace.code-workspace
 build
+cnn
