@@ -38,6 +38,15 @@
         </parameters>
     </module> -->
 
+    <module name="VideoPub">
+        <parameters>
+            <parameter name="CAMERA_INDEX" value="0" />
+            <parameter name="BITRATE" value="2000" />
+            <parameter name="REMOTE_HOST" value="127.0.0.1" />
+            <parameter name="OUT_PORT" value="5553" />
+        </parameters>
+    </module>
+
     <!-- <module name="VideoPlayer">
         <parameters>
         </parameters>
