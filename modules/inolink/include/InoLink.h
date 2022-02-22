@@ -25,7 +25,8 @@ public:
 private:
     int Init_Serial_Port();
     int Deinit_Serial_Port();
-    int Update_Servos();
+    std::string Convert_Servo_Vals();
+    int Write_Servo_Vals();
 
     mn::CppLinuxSerial::SerialPort* serial_port;
 };

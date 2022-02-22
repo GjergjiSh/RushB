@@ -12,17 +12,18 @@ int InoLink::Init()
 
 int InoLink::Cycle_Step()
 {
-    return Update_Servos();
+    return Write_Servo_Vals();
 }
 
 int InoLink::Deinit()
 {
+    LOG_INFO("Deinitializing...");
     if (Deinit_Serial_Port() != 0) {
         return -1;
         delete serial_port;
     }
+
     delete serial_port;
-    LOG_INFO("Deinitializing...");
     return 0;
 }
 
@@ -55,17 +56,27 @@ int InoLink::Deinit_Serial_Port()
     return 0;
 }
 
-int InoLink::Update_Servos()
+std::string InoLink::Convert_Servo_Vals()
+{
+    /* (int)(((-1 * stick_coordinates[RIGHTSTICK].x + 32767) * 90) / 32767) */
+    int c_left_servo = ((shared_data->servos.left_servo + 100) * 90) / 100;
+    int c_right_servo = ((shared_data->servos.right_servo + 100) * 90) / 100;
+    int c_top_servo = ((shared_data->servos.top_servo + 100) * 90) / 100;
+
+    std::string left_servo = std::to_string(c_left_servo) + "%";
+    std::string right_servo = std::to_string(c_right_servo) + "#";
+    std::string top_servo = std::to_string(c_top_servo) + "&";
+    std::string output_servo_string = left_servo + right_servo + top_servo;
+
+    std::cout << output_servo_string << std::endl;
+
+    return output_servo_string;
+}
+
+int InoLink::Write_Servo_Vals()
 {
     try {
-        std::string left_servo = std::to_string(shared_data->servos.left_servo) + "%";
-        std::string right_servo = std::to_string(shared_data->servos.right_servo) + "#";
-        std::string top_servo = std::to_string(shared_data->servos.top_servo)  + "&";
-        std::string s_driver_wish = left_servo + right_servo + top_servo;
-
-        std::cout << s_driver_wish << std::endl;
-        serial_port->Write("!" + s_driver_wish + "\n");
-
+        serial_port->Write("!" + Convert_Servo_Vals() + "\n");
     } catch (mn::CppLinuxSerial::Exception& ex) {
         LOG_ERROR_DESCRIPTION("Failed to write driver wishes to the robot.", ex.what());
         return -1;
