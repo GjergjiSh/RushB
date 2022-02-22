@@ -1,7 +1,7 @@
 #include "InoLink.h"
 
 InoLink::InoLink() {
-    this->name="InoLink";
+    name="InoLink";
 }
 
 int InoLink::Init()
@@ -30,11 +30,11 @@ int InoLink::Init_Serial_Port()
 {
     try {
         std::string port = parameters.at("SERIAL_PORT");
-        this->serial_port = new mn::CppLinuxSerial::SerialPort(port,
+        serial_port = new mn::CppLinuxSerial::SerialPort(port,
             mn::CppLinuxSerial::BaudRate::B_460800);
 
-        this->serial_port->SetTimeout(-1);
-        this->serial_port->Open();
+        serial_port->SetTimeout(-1);
+        serial_port->Open();
         LOG_INFO("Arduino board connected on port: " + port);
     } catch (mn::CppLinuxSerial::Exception& ex) {
         LOG_ERROR_DESCRIPTION("Connection to Arduino failed to initialize." , ex.what());
@@ -46,10 +46,10 @@ int InoLink::Init_Serial_Port()
 int InoLink::Deinit_Serial_Port()
 {
     try {
-        this->serial_port->Close();
+        serial_port->Close();
         LOG_INFO("Connection to Arduino deinitialized")
     } catch (mn::CppLinuxSerial::Exception& ex) {
-        LOG_ERROR_DESCRIPTION("InoLink ] Connection to Arduino failed to deinitialize", ex.what());
+        LOG_ERROR_DESCRIPTION("Connection to Arduino failed to deinitialize", ex.what());
         return -1;
     }
     return 0;
@@ -64,7 +64,7 @@ int InoLink::Update_Servos()
         std::string s_driver_wish = left_servo + right_servo + top_servo;
 
         std::cout << s_driver_wish << std::endl;
-        this->serial_port->Write("!" + s_driver_wish + "\n");
+        serial_port->Write("!" + s_driver_wish + "\n");
 
     } catch (mn::CppLinuxSerial::Exception& ex) {
         LOG_ERROR_DESCRIPTION("Failed to write driver wishes to the robot.", ex.what());

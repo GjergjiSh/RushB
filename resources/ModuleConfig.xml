@@ -60,4 +60,10 @@
         </parameters>
     </module>
 
+    <module name="InoLink">
+        <parameters>
+            <parameter name="SERIAL_PORT" value="/dev/ttyACM0" />
+        </parameters>
+    </module>
+
 </modules>
