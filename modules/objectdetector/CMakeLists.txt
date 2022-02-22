@@ -15,7 +15,6 @@ set(MODULE_INTERFACE_DIR "../../include")
 
 add_library(ObjectDetector SHARED .
     src/ObjectDetector.cpp
-    src/DistanceEstimator.cpp
 )
 
 set_target_properties(ObjectDetector PROPERTIES

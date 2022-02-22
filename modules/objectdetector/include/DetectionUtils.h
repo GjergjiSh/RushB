@@ -8,14 +8,14 @@
 #include <opencv2/imgproc.hpp>
 #include <string>
 
-#define DRAW true
-#define NO_DRAW false
-
 namespace DetectionUtils {
 
 using namespace std::chrono;
 
-    typedef struct {
+#define DRAW true
+#define NO_DRAW false
+
+typedef struct {
     double time_pre_process; // [msec]
     double time_inference; // [msec]
     double time_post_process; // [msec]
@@ -103,43 +103,6 @@ public:
     std::ofstream stream;
     std::string csv_file;
 };
-
-
-//Used in previous versions; is now deprecated. Calculates time in ms between tick() and tock()
-class InferenceClock {
-
-public:
-    InferenceClock()
-        : total_time(std::chrono::nanoseconds(0))
-        , tock_counter(0)
-    {
-        std::cout << "Inference Clock is active" << std::endl;
-    }
-
-    std::chrono::_V2::system_clock::time_point Tick()
-    {
-        return std::chrono::high_resolution_clock::now();
-    }
-
-    int64_t Tock(std::chrono::_V2::system_clock::time_point start_time)
-    {
-        auto end_time = std::chrono::high_resolution_clock::now();
-        auto inference_time = (end_time - start_time);
-        this->tock_counter++;
-        auto inference_time_ms = inference_time / std::chrono::milliseconds(1);
-        this->total_time += inference_time;
-        average_time = (this->total_time / std::chrono::milliseconds(1)) / this->tock_counter;
-
-        return inference_time_ms;
-    }
-
-private:
-    std::chrono::nanoseconds total_time;
-    int tock_counter;
-
-    long average_time;
-};
-
 }
 
 #endif /* UTILS_H */

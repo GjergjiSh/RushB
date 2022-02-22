@@ -1,7 +1,7 @@
 #include "ModuleInterface.h"
+#include "DetectionUtils.h"
 #include <mutex>
 
-#include "DistanceEstimator.h"
 #include "tensorflow/cc/client/client_session.h"
 #include "tensorflow/cc/saved_model/loader.h"
 #include "tensorflow/core/framework/graph.pb.h"
@@ -37,7 +37,6 @@ private:
 
     tensorflow::Tensor Convert_Mat_To_Tensor(cv::Mat src);
 
-    DistanceEstimator distance_estimator;
     std::vector<std::string> labels;
     const char* model_path;
     const char* label_path;

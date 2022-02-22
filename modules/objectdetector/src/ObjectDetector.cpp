@@ -69,7 +69,6 @@ std::vector<DetectionUtils::tBoundingBox> ObjectDetector::Detect(cv::Mat& src, b
             //#Note: Id indexing starts form 1
             bounding_box.id = predicted_labels(0, i);
             bounding_box.label = labels[bounding_box.id-1];
-            bounding_box.distance = this->distance_estimator.Estimate_Distance(bounding_box);
 
             detections.push_back(bounding_box);
 
@@ -90,18 +89,16 @@ std::vector<DetectionUtils::tBoundingBox> ObjectDetector::Detect(cv::Mat& src, b
 
 int ObjectDetector::Load_Labels()
 {
-    std::ifstream names(this->label_path);
-    std::string cls;
+    std::ifstream labels_file(this->label_path);
+    std::string label;
 
-    if (names) {
-        while (getline(names, cls)) {
-            this->labels.emplace_back(cls);
+    if (labels_file) {
+        while (getline(labels_file, label)) {
+            this->labels.emplace_back(label);
         }
-
-        //LOG_INFO("Loaded labels from:")
-        printf("Loaded labels from: %s \n", this->label_path);
+        LOG_INFO(std::string("Loaded labels from: ").append(this->label_path));
     } else {
-        std::cout << "ObjectDetector failed to load classes" << std::endl;
+        LOG_ERROR("Failed to load labels");
         return -1;
     }
     return 0;
@@ -123,7 +120,7 @@ int ObjectDetector::Init_Model()
     setenv("CUDA_VISIBLE_DEVICES", "0,1", -1);
 
     if (!status.ok()) {
-        std::cout << "ObjectDetector failed to initialize model" << std::endl;
+        LOG_ERROR("Failed to load model");
         return -1;
     }
 
@@ -133,7 +130,10 @@ int ObjectDetector::Init_Model()
 
     for (int index = 0; index < response.size(); ++index) {
         auto value = response[index];
-        std::cout << "Available device: " << index << "  " << response[index].name() << std::endl;
+        std::cout << "[I][ObjectDetector] Available device: "
+                  << index << "  "
+                  << response[index].name()
+                  << std::endl;
     }
 
     return 0;
@@ -143,21 +143,11 @@ int ObjectDetector::Init_Detector()
 {
     model_path = parameters.at("MODEL_PATH").c_str();
     label_path = parameters.at("LABEL_PATH").c_str();
-    estimator_config_path = parameters.at("EST_CONFIG_PATH").c_str();
     confidence_threshold = std::stof(parameters.at("CONFIDENCE_THRESHOLD"));
 
     if (Init_Model() != 0) return -1;
     if (Load_Labels() != 0) return -1;
 
-    if (distance_estimator.Init(estimator_config_path) != 0)
-        return -1;
-
-    // if (status == 0) {
-    //     status = distance_estimator.Init(estimator_config_path);
-    // } else {
-    //     std::cout << "ObjectDetector failed to initialize" << std::endl;
-    //     return -1;
-    // }
     return 0;
 }
 
