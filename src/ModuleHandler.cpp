@@ -20,12 +20,16 @@ int ModuleHandler::Init()
         return -1;
 
     // Initialize each loaded module
+    auto start = std::chrono::system_clock::now();
     for (auto module : registered_modules) {
         if (module->Init() != 0) {
             LOG_ERROR(std::string("Failed to initialize module: ").append(module->name));
             return -1;
         };
     }
+    auto end = std::chrono::system_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    LOG_TIME_INFO("Initialized modules in: ", elapsed.count());
 
     // Initialize the signal handler
     sig_handler.Init();
