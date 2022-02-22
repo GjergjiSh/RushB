@@ -15,11 +15,11 @@ int Controller::Init()
 
 int Controller::Cycle_Step()
 {
-    if (Process_Input() != 0)
-        return -1;
+    Process_Input();
 
     shared_data->servos.left_servo = state.stick_coordinates[LEFTSTICK].y;
     shared_data->servos.right_servo = state.stick_coordinates[RIGHTSTICK].x;
+
     // missing stuff for top servo
     return 0;
 }
@@ -38,7 +38,7 @@ int Controller::Initialize_Device()
 {
     LOG_INFO("Initializing...");
     char name[256] = "Unknown";
-    if ((file_descriptor = open(device_path, O_RDONLY)) < 0) {
+    if ((file_descriptor = open(device_path, O_RDONLY | O_NONBLOCK)) < 0) {
         fprintf(stderr, "[E][Controller] Cannot open %s: %s.\n", this->device_path, strerror(errno));
         return -1;
     } else {
