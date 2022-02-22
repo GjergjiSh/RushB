@@ -35,6 +35,8 @@ private:
     int Init_Model();
     int Load_Labels();
 
+    void Warmup();
+
     tensorflow::Tensor Convert_Mat_To_Tensor(cv::Mat src);
 
     std::vector<std::string> labels;
@@ -58,6 +60,7 @@ private:
     };
 
     DetectionUtils::inference_time_result_t inference_time_result = {};
+    bool time_log;
 
     std::mutex mtx;
 };

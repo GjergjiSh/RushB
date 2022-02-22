@@ -12,11 +12,13 @@ int ObjectDetector::Init()
 
 int ObjectDetector::Cycle_Step()
 {
-    cv::Mat frame = cv::Mat(480, 640, CV_8UC3, (void *)this->shared_data->video.frame);
     std::scoped_lock<std::mutex> lock(mtx);
-    std::vector<DetectionUtils::tBoundingBox> results = Detect(frame, DRAW);
-    return 0;
-}
+    cv::Mat frame = cv::Mat(480, 640, CV_8UC3, (void*)this->shared_data->video.frame);
+    if (frame.data) {
+        std::vector<DetectionUtils::tBoundingBox> results = Detect(frame, DRAW);
+    }
+        return 0;
+    }
 
 int ObjectDetector::Deinit()
 {
@@ -68,7 +70,7 @@ std::vector<DetectionUtils::tBoundingBox> ObjectDetector::Detect(cv::Mat& src, b
 
             //#Note: Id indexing starts form 1
             bounding_box.id = predicted_labels(0, i);
-            bounding_box.label = labels[bounding_box.id-1];
+            bounding_box.label = labels[bounding_box.id - 1];
 
             detections.push_back(bounding_box);
 
@@ -79,10 +81,16 @@ std::vector<DetectionUtils::tBoundingBox> ObjectDetector::Detect(cv::Mat& src, b
     }
     auto time_post_process1 = std::chrono::steady_clock::now();
 
-    //Calculate inference time results for the last frame: pre,during and post processing
+    // Calculate inference time results for the last frame: pre,during and post processing
     this->inference_time_result.time_post_process = (time_post_process1 - time_post_process0).count() / 1000000.0;
     this->inference_time_result.time_inference = (time_inference1 - time_inference0).count() / 1000000.0;
     this->inference_time_result.time_pre_process = (time_preprocess1 - time_preprocess0).count() / 1000000.0;
+
+    if (time_log) {
+        LOG_TIME_INFO("Pre-process time", inference_time_result.time_pre_process);
+        LOG_TIME_INFO("Inference time", inference_time_result.time_inference);
+        LOG_TIME_INFO("Post-process time", inference_time_result.time_post_process);
+    }
 
     return detections;
 }
@@ -139,15 +147,25 @@ int ObjectDetector::Init_Model()
     return 0;
 }
 
+// Feed initial white image to the detector to warm up the neural network
+void ObjectDetector::Warmup()
+{
+    LOG_INFO("Warming up");
+    cv::Mat warmup_img(640, 480, CV_8UC3, cv::Scalar(255, 255, 255));
+    Detect(warmup_img, DRAW);
+}
+
 int ObjectDetector::Init_Detector()
 {
     model_path = parameters.at("MODEL_PATH").c_str();
     label_path = parameters.at("LABEL_PATH").c_str();
     confidence_threshold = std::stof(parameters.at("CONFIDENCE_THRESHOLD"));
+    time_log = std::stof(parameters.at("TIME_LOG"));
 
     if (Init_Model() != 0) return -1;
     if (Load_Labels() != 0) return -1;
 
+    Warmup();
     return 0;
 }
 
