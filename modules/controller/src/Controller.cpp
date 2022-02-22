@@ -61,14 +61,14 @@ bool Controller::Connected()
     return false;
 }
 
-// Update the coordiantes of the thumbsticks, normalized between -1 and 1
+// Update the coordiantes of the thumbsticks, normalized between -100 and 100
 void Controller::Handle_Thumbstick_Events()
 {
     size_t thumbstick = event.number / 2;
     if (event.number % 2 == 0)
-        state.stick_coordinates[thumbstick].x = (event.value) / MAX_COORD_VAL;
+        state.stick_coordinates[thumbstick].x = -1 * ((event.value) / MAX_COORD_VAL);
     else
-        state.stick_coordinates[thumbstick].y = (event.value) / MAX_COORD_VAL;
+        state.stick_coordinates[thumbstick].y = -1 * ((event.value) / MAX_COORD_VAL);
 }
 
 // Update the state of the buttons
