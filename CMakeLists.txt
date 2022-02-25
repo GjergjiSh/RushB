@@ -47,7 +47,7 @@ add_custom_command( TARGET ControlCenter POST_BUILD
 
 add_custom_target(install_modules ALL
         COMMENT echo "Installing Example Modules"
-        COMMAND  find ${CMAKE_CURRENT_BINARY_DIR}/example-modules -type f | grep -i so | xargs -i cp {} ${CMAKE_CURRENT_BINARY_DIR}/example-modules
+        COMMAND  find ${CMAKE_CURRENT_BINARY_DIR}/example-modules -type f | grep -i so | xargs -i cp {} ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
         COMMENT echo "Installing Modules"
         COMMAND  find ${CMAKE_CURRENT_BINARY_DIR}/modules -type f | grep -i so | xargs -i cp {} ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
 )
