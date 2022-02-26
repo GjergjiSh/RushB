@@ -24,7 +24,6 @@ int ZmqPipeline::Init()
 int ZmqPipeline::Cycle_Step()
 {
     // Publish all pub topics and their data
-    std::string data;
     for (auto topic : publisher_topics) {
         if ((this->*publisher_funcs.at(topic))(topic) != 0)
             return -1;
