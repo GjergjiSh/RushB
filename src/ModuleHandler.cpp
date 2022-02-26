@@ -1,40 +1,36 @@
 #include "ModuleHandler.h"
 #include  <chrono>
 
-ModuleHandler::ModuleHandler(const char* modules_cfg, bool verbose) : modules_cfg(modules_cfg), verbose(verbose)
-{
-    LOG_INFO(std::string("ModuleHandler Version: ").append(VERSION));
-    memset(&shared_data, 0, sizeof(shared_data));
-}
-
-ModuleHandler::~ModuleHandler(){}
+ModuleHandler::ModuleHandler(const char* modules_cfg, bool verbose)
+    : modules_cfg(modules_cfg), verbose(verbose), logger(Logger("ModuleHandler")){}
 
 int ModuleHandler::Init()
 {
+    // Init values of shared data members to 0
+    memset(&shared_data, 0, sizeof(shared_data));
+
     // Parse the XML Configuration File
-    if (Parse_Configuration() != 0)
-        return -1;
+    if (Parse_Configuration() != 0) return -1;
 
     // Load the Modules in the lib folder
-    if (Register_Modules() != 0)
-        return -1;
+    if (Register_Modules() != 0) return -1;
 
     // Initialize each loaded module
     auto start = std::chrono::system_clock::now();
     for (auto module : registered_modules) {
         if (module->Init() != 0) {
-            LOG_ERROR(std::string("Failed to initialize module: ").append(module->name));
+            logger.LOG_ERROR(std::string("Failed to initialize module: ").append(module->name));
             return -1;
         };
     }
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    LOG_TIME_INFO("Initialized modules in: ", elapsed.count());
+    logger.LOG_TIME_INFO("Initialized modules in ", elapsed.count());
 
     // Initialize the signal handler
     sig_handler.Init();
 
-    LOG_INFO("Initialization finished");
+    logger.LOG_INFO("Initialization finished");
     return 0;
 }
 
@@ -46,14 +42,15 @@ int ModuleHandler::Deinit()
         Destroy_t* Destroy_Module = (Destroy_t*)dlsym(module->lib_handle, "Destroy");
         const char* dlsym_error = dlerror();
         if (dlsym_error)
-            LOG_ERROR_DESCRIPTION("Failed to load symbol destroy: ", dlsym_error)
+            logger.LOG_ERROR_DESCRIPTION("Failed to load symbol destroy: ", dlsym_error);
 
+        // Delete the module
         Destroy_Module(module);
 
         if (dlclose(module->lib_handle) != 0)
-            LOG_ERROR_DESCRIPTION("Failed to destroy module :", dlerror());
+            logger.LOG_ERROR_DESCRIPTION("Failed to destroy module :", dlerror());
     }
-    LOG_INFO("Deinitialization finished");
+    logger.LOG_INFO("Deinitialization finished");
     return 0;
 }
 
@@ -66,16 +63,16 @@ int ModuleHandler::Run()
                 // Print cycle time for each module
                 auto start = std::chrono::system_clock::now();
                 if (module->Cycle_Step() != 0) {
-                    LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
+                    logger.LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
                     return -1;
                 };
                 auto end = std::chrono::system_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                LOG_TIME_INFO(std::string("Cycle target: ").append(module->name), elapsed.count());
+                logger.LOG_TIME_INFO(std::string("Cycle target: ").append(module->name), elapsed.count());
             } else {
                 // Trigger cycle without printing time info
                 if (module->Cycle_Step() != 0) {
-                    LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
+                    logger.LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
                     return -1;
                 };
             }
@@ -90,7 +87,7 @@ int ModuleHandler::Parse_Configuration()
     // Load XML config file into memory
     pugi::xml_parse_result parse_result = modules_xml.load_file(modules_cfg);
     if (!parse_result) {
-        LOG_ERROR_DESCRIPTION("Failed to parse the modules configuration file",
+        logger.LOG_ERROR_DESCRIPTION("Failed to parse the modules configuration file",
             parse_result.description());
         return -1;
     }
@@ -105,7 +102,7 @@ int ModuleHandler::Register_Modules()
         // Load the library
         void* lib_handle = dlopen(entry.path().c_str(), RTLD_LAZY);
         if (!lib_handle) {
-            LOG_ERROR_DESCRIPTION("Failed to load library: ", dlerror());
+            logger.LOG_ERROR_DESCRIPTION("Failed to load library: ", dlerror());
             return -1;
         }
 
@@ -116,7 +113,7 @@ int ModuleHandler::Register_Modules()
         Create_t* Create_Module = (Create_t*)dlsym(lib_handle, "Create");
         const char* dlsym_error = dlerror();
         if (dlsym_error) {
-            LOG_ERROR_DESCRIPTION("Failed to load symbol create: ", dlsym_error);
+            logger.LOG_ERROR_DESCRIPTION("Failed to load symbol create: ", dlsym_error);
             return -1;
         }
 
@@ -141,7 +138,7 @@ int ModuleHandler::Register_Modules()
 
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    LOG_TIME_INFO("Finished registering modules", elapsed.count());
+    logger.LOG_TIME_INFO("Finished registering modules in ", elapsed.count());
     return 0;
 }
 
@@ -166,10 +163,12 @@ int ModuleHandler::Assign_Module_Parameters(Module* module)
 void ModuleHandler::Print_Module_Parameters(Module* module)
 {
     for (auto parameter : module->parameters) {
-        std::cout << "[I][ModuleHandler] "
+        std::cout << "[" << logger.Time_Stamp() << "] "
+                  << "\033[1;36m[I][ModuleHandler] "
                   <<  module->name << " -> "
                   << " Parameter: " << parameter.first
                   << " Value: " << parameter.second
+                  << "\033[0m"
                   <<  std::endl;
     }
 }

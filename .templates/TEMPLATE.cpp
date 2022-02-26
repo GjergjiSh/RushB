@@ -2,6 +2,7 @@
 
 TEMPLATE::TEMPLATE() {
     this->name="TEMPLATE";
+    logger = Logger("TEMPLATE");
 }
 
 int TEMPLATE::Init()
@@ -10,7 +11,7 @@ int TEMPLATE::Init()
         std::cout << parameter.first << " value is " << parameter.second << std::endl;
     }
 
-    LOG_INFO("Initializing...");
+    logger.LOG_INFO("Initializing...");
     return 0;
 }
 
@@ -23,7 +24,7 @@ int TEMPLATE::Cycle_Step()
 int TEMPLATE::Deinit()
 {
 
-    LOG_INFO("Deinitializing...");
+    logger.LOG_INFO("Deinitializing...");
     return 0;
 }
 
