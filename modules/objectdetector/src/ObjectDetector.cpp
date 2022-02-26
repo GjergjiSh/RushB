@@ -1,18 +1,18 @@
 #include "ObjectDetector.h"
 
 ObjectDetector::ObjectDetector() {
-    this->name="ObjectDetector";
+    name="ObjectDetector";
+    logger.Set_Name(name);
 }
 
 int ObjectDetector::Init()
 {
-    LOG_INFO("Initializing...");
+    logger.LOG_INFO("Initializing...");
     return Init_Detector();
 }
 
 int ObjectDetector::Cycle_Step()
 {
-    std::scoped_lock<std::mutex> lock(mtx);
     cv::Mat frame = cv::Mat(480, 640, CV_8UC3, (void*)this->shared_data->video.frame);
     if (frame.data) {
         std::vector<DetectionUtils::tBoundingBox> results = Detect(frame, DRAW);
@@ -22,7 +22,7 @@ int ObjectDetector::Cycle_Step()
 
 int ObjectDetector::Deinit()
 {
-    LOG_INFO("Deinitializing...");
+    logger.LOG_INFO("Deinitializing...");
     return 0;
 }
 
@@ -87,9 +87,9 @@ std::vector<DetectionUtils::tBoundingBox> ObjectDetector::Detect(cv::Mat& src, b
     this->inference_time_result.time_pre_process = (time_preprocess1 - time_preprocess0).count() / 1000000.0;
 
     if (time_log) {
-        LOG_TIME_INFO("Pre-process time", inference_time_result.time_pre_process);
-        LOG_TIME_INFO("Inference time", inference_time_result.time_inference);
-        LOG_TIME_INFO("Post-process time", inference_time_result.time_post_process);
+        logger.LOG_TIME_INFO("Pre-process time", inference_time_result.time_pre_process);
+        logger.LOG_TIME_INFO("Inference time", inference_time_result.time_inference);
+        logger.LOG_TIME_INFO("Post-process time", inference_time_result.time_post_process);
     }
 
     return detections;
@@ -104,9 +104,9 @@ int ObjectDetector::Load_Labels()
         while (getline(labels_file, label)) {
             this->labels.emplace_back(label);
         }
-        LOG_INFO(std::string("Loaded labels from: ").append(this->label_path));
+        logger.LOG_INFO(std::string("Loaded labels from: ").append(this->label_path));
     } else {
-        LOG_ERROR("Failed to load labels");
+        logger.LOG_ERROR("Failed to load labels");
         return -1;
     }
     return 0;
@@ -128,7 +128,7 @@ int ObjectDetector::Init_Model()
     setenv("CUDA_VISIBLE_DEVICES", "0,1", -1);
 
     if (!status.ok()) {
-        LOG_ERROR("Failed to load model");
+        logger.LOG_ERROR("Failed to load model");
         return -1;
     }
 
@@ -150,7 +150,7 @@ int ObjectDetector::Init_Model()
 // Feed initial white image to the detector to warm up the neural network
 void ObjectDetector::Warmup()
 {
-    LOG_INFO("Warming up");
+    logger.LOG_INFO("Warming up");
     cv::Mat warmup_img(640, 480, CV_8UC3, cv::Scalar(255, 255, 255));
     Detect(warmup_img, DRAW);
 }

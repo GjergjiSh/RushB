@@ -1,6 +1,5 @@
 #include "ModuleInterface.h"
 #include "DetectionUtils.h"
-#include <mutex>
 
 #include "tensorflow/cc/client/client_session.h"
 #include "tensorflow/cc/saved_model/loader.h"
@@ -8,17 +7,7 @@
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/graph/graph_def_builder.h"
 #include "tensorflow/core/public/session.h"
-
-#define LOG_INFO(msg) \
-    std::cout << "[I][ObjectDetector] " << msg << std::endl;
-#define LOG_TIME_INFO(msg, time) \
-    std::cerr << "[I][ObjectDetector] " << msg << " [" << time << " ms]" << std::endl;
-#define LOG_WARNING(msg) \
-    std::cerr << "[W][ObjectDetector] " << msg << std::endl;
-#define LOG_ERROR_DESCRIPTION(msg, err) \
-    std::cerr << "[E][ObjectDetector] " << msg << " " << err << std::endl;
-#define LOG_ERROR(msg) \
-    std::cerr << "[E][ObjectDetector] " << msg << std::endl;
+#include "Logger.h"
 
 class ObjectDetector : public Module {
 
@@ -27,6 +16,8 @@ public:
     int Init(void) override;
     int Cycle_Step(void) override;
     int Deinit(void) override;
+
+    Logger logger;
 private:
 
     std::vector<DetectionUtils::tBoundingBox> Detect(cv::Mat&, bool draw);
@@ -61,6 +52,4 @@ private:
 
     DetectionUtils::inference_time_result_t inference_time_result = {};
     bool time_log;
-
-    std::mutex mtx;
 };

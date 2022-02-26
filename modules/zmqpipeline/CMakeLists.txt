@@ -7,12 +7,13 @@ set(CMAKE_CXX_FLAGS
 "${CMAKE_CXX_FLAGS} -O3 -O2 -std=c++17 -Wno-deprecated-declarations"
 )
 
-set(MODULE_INTERFACE_DIR "../../include")
-set(CMAKE_CXX_STANDARD 17)
+set(CONTROL_CENTER_DIR "../../")
+set(MODULE_INTERFACE_DIR ${CONTROL_CENTER_DIR}/include)
 
 add_library(ZmqPipeline SHARED .
     src/ZmqPipeline.cpp
     src/ProtoModuleInterface.pb.cc
+    ${CONTROL_CENTER_DIR}/src/Logger.cpp
 )
 
 set_target_properties(ZmqPipeline PROPERTIES

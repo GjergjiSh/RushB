@@ -8,6 +8,8 @@ public:
     int Init(void) override;
     int Cycle_Step(void) override;
     int Deinit(void) override;
-private:
+
     Logger logger;
+
+private:
 };

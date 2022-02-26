@@ -2,7 +2,10 @@
 #include  <chrono>
 
 ModuleHandler::ModuleHandler(const char* modules_cfg, bool verbose)
-    : modules_cfg(modules_cfg), verbose(verbose), logger(Logger("ModuleHandler")){}
+    : modules_cfg(modules_cfg), verbose(verbose)
+    {
+        logger.Set_Name("ModuleHandler");
+    }
 
 int ModuleHandler::Init()
 {
@@ -123,7 +126,7 @@ int ModuleHandler::Register_Modules()
         module->shared_data = &shared_data;
 
         // Only register if the module is in the XML config
-        pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name);
+        pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name.c_str());
         if (!module_node) {
             delete module;
             continue;
@@ -145,7 +148,7 @@ int ModuleHandler::Register_Modules()
 int ModuleHandler::Assign_Module_Parameters(Module* module)
 {
     // Find the module's node in the XML config file
-    pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name);
+    pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name.c_str());
     pugi::xml_node parameters_node = module_node.child("parameters");
 
     // Assign the parameter names and values to the module
@@ -164,11 +167,10 @@ void ModuleHandler::Print_Module_Parameters(Module* module)
 {
     for (auto parameter : module->parameters) {
         std::cout << "[" << logger.Time_Stamp() << "] "
-                  << "\033[1;36m[I][ModuleHandler] "
+                  << "\033[1;36m[I][ModuleHandler]\033[0m "
                   <<  module->name << " -> "
                   << " Parameter: " << parameter.first
                   << " Value: " << parameter.second
-                  << "\033[0m"
                   <<  std::endl;
     }
 }

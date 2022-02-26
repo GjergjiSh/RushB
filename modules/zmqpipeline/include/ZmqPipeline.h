@@ -1,19 +1,8 @@
 #include "ModuleInterface.h"
 #include "ProtoModuleInterface.pb.h"
+#include "Logger.h"
+
 #include <zmq.hpp>
-
-#define LOG_INFO(msg) \
-    std::cout << "[I][ZmqPipeline] " << msg << std::endl;
-#define LOG_TIME_INFO(msg, time) \
-    std::cerr << "[I][ZmqPipeline] " << msg << " [" << time << " ms]" << std::endl;
-#define LOG_WARNING(msg) \
-    std::cerr << "[W][ZmqPipeline] " << msg << std::endl;
-#define LOG_ERROR_DESCRIPTION(msg, err) \
-    std::cerr << "[E][ZmqPipeline] " << msg << " " << err << std::endl;
-#define LOG_ERROR(msg) \
-    std::cerr << "[E][ZmqPipeline] " << msg << std::endl;
-
-
 
 class ZmqPipeline : public Module {
 public:
@@ -21,6 +10,8 @@ public:
     int Init(void) override;
     int Cycle_Step(void) override;
     int Deinit(void) override;
+
+    Logger logger;
 
 private:
     int Init_Connection();
@@ -56,5 +47,4 @@ private:
 
     std::unordered_map<std::string, int (ZmqPipeline::*)(std::string&)> publisher_funcs;
     std::unordered_map<std::string, int (ZmqPipeline::*)()> subscriber_funcs;
-
 };

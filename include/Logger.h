@@ -25,8 +25,10 @@
 class Logger {
 
 public:
-    Logger(std::string name);
+    Logger() = default;
     ~Logger() = default;
+
+    void Set_Name(std::string name);
 
     void LOG_INFO(std::string msg);
     void LOG_TIME_INFO(std::string msg, int time);

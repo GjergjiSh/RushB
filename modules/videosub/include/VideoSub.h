@@ -1,18 +1,8 @@
 #include "ModuleInterface.h"
+#include "Logger.h"
 
 #include <gst/gst.h>
 #include <mutex>
-
-#define LOG_INFO(msg) \
-    std::cout << "[I][VideoSub] " << msg << std::endl;
-#define LOG_TIME_INFO(msg, time) \
-    std::cerr << "[I][VideoSub] " << msg << " [" << time << " ms]" << std::endl;
-#define LOG_WARNING(msg) \
-    std::cerr << "[W][VideoSub] " << msg << std::endl;
-#define LOG_ERROR_DESCRIPTION(msg, err) \
-    std::cerr << "[E][VideoSub] " << msg << " " << err << std::endl;
-#define LOG_ERROR(msg) \
-    std::cerr << "[E][VideoSub] " << msg << std::endl;
 
 /**************************************    Pipeline    *********************************
 
@@ -49,6 +39,7 @@ public:
     int Cycle_Step(void) override;
     int Deinit(void) override;
 
+    Logger logger;
     std::mutex video_mutex;
 
 private:

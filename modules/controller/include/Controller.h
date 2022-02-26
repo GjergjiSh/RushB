@@ -2,6 +2,7 @@
 #define CONTROLLER_H
 
 #include "ModuleInterface.h"
+#include "Logger.h"
 
 #include <linux/joystick.h>
 #include <errno.h>
@@ -24,17 +25,6 @@
 #define RELEASED 0
 
 #define MAX_COORD_VAL 327.67
-
-#define LOG_INFO(msg) \
-    std::cout << "[I][Controller] " << msg << std::endl;
-#define LOG_TIME_INFO(msg, time) \
-    std::cerr << "[I][Controller] " << msg << " [" << time << " ms]" << std::endl;
-#define LOG_WARNING(msg) \
-    std::cerr << "[W][Controller] " << msg << std::endl;
-#define LOG_ERROR_DESCRIPTION(msg, err) \
-    std::cerr << "[E][Controller] " << msg << " " << err << std::endl;
-#define LOG_ERROR(msg) \
-    std::cerr << "[E][Controller] " << msg << std::endl;
 
 struct coordinates_t {
     float x, y;
@@ -64,6 +54,8 @@ public:
     int Initialize_Device();
     void Print_Driver_Wish();
 
+    Logger logger;
+
 private:
     void Handle_Button_Events();
     void Handle_Thumbstick_Events();
@@ -73,6 +65,8 @@ private:
     int file_descriptor;
     state_t state;
     js_event event;
+
+
 };
 
 #endif /* CONTROLLER_H */

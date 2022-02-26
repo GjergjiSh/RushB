@@ -46,7 +46,7 @@ public:
     virtual int Cycle_Step(void) = 0;
     virtual int Deinit(void) = 0;
 
-    const char* name;
+    std::string name;
     std::unordered_map<std::string, std::string> parameters;
     void* lib_handle;
     SharedData_t* shared_data;

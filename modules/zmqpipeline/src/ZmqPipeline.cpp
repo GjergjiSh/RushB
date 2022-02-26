@@ -17,7 +17,7 @@ ZmqPipeline::ZmqPipeline()
 
 int ZmqPipeline::Init()
 {
-    LOG_INFO("Initializing...");
+    logger.LOG_INFO("Initializing...");
     return Init_Connection();
 }
 
@@ -40,7 +40,7 @@ int ZmqPipeline::Cycle_Step()
 
 int ZmqPipeline::Deinit()
 {
-    LOG_INFO("Deinitializing...");
+    logger.LOG_INFO("Deinitializing...");
     return Deinit_Connection();
 }
 
@@ -49,7 +49,7 @@ int ZmqPipeline::Construct_Sockets()
     try { // Create the publisher socket
         publisher = zmq::socket_t(zmq_context, zmq::socket_type::pub);
     } catch (zmq::error_t& e) {
-        LOG_ERROR_DESCRIPTION("Failed to construct the publisher: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to construct the publisher: ", e.what());
         return -1;
     }
 
@@ -64,7 +64,7 @@ int ZmqPipeline::Construct_Sockets()
             }
         }
     } catch (zmq::error_t& e) {
-        LOG_ERROR_DESCRIPTION("Failed to construct the subscribers: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to construct the subscribers: ", e.what());
         return -1;
     }
 
@@ -77,7 +77,7 @@ int ZmqPipeline::Configure_Sockets()
         publisher.setsockopt(ZMQ_LINGER, 0);
         publisher.bind(output_endpoint);
     } catch (zmq::error_t& e) {
-        LOG_ERROR_DESCRIPTION("Failed to configure the publisher: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to configure the publisher: ", e.what());
         return -1;
     }
 
@@ -88,7 +88,7 @@ int ZmqPipeline::Configure_Sockets()
             socket.connect(input_endpoint);
         }
     } catch (zmq::error_t& e) {
-        LOG_ERROR_DESCRIPTION("Failed to configure the subscribers: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to configure the subscribers: ", e.what());
         return -1;
     }
 
@@ -100,7 +100,7 @@ int ZmqPipeline::Init_Connection()
     try { // Initialize the zmq context
         zmq_context = zmq::context_t(1);
     } catch (zmq::error_t& e) {
-        LOG_ERROR_DESCRIPTION("Failed to initialize the zmq context: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to initialize the zmq context: ", e.what());
         return -1;
     }
 
@@ -119,7 +119,7 @@ int ZmqPipeline::Init_Endpoints()
         input_endpoint.append(parameters.at("IN_PORT"));
         output_endpoint.append(parameters.at("OUT_PORT"));
     } catch (std::exception& e) {
-        LOG_ERROR_DESCRIPTION("Failed to initialize the endpoints", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to initialize the endpoints", e.what());
         return -1;
     }
 
@@ -131,7 +131,7 @@ int ZmqPipeline::Deinit_Connection()
     try { // Close the publisher socket
         publisher.close();
     } catch (zmq::error_t& e) {
-        LOG_ERROR_DESCRIPTION("Failed to close the publisher: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to close the publisher: ", e.what());
         return -1;
     }
 
@@ -140,14 +140,14 @@ int ZmqPipeline::Deinit_Connection()
             socket.close();
         }
     } catch (zmq::error_t& e) {
-        LOG_ERROR_DESCRIPTION("Failed to close the subscribers: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to close the subscribers: ", e.what());
         return -1;
     }
 
     try { // Close the zmq context
         zmq_context.close();
     } catch (zmq::error_t& e) {
-        LOG_ERROR_DESCRIPTION("Failed to close the zmq context: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to close the zmq context: ", e.what());
         return -1;
     }
 
@@ -173,7 +173,7 @@ int ZmqPipeline::Send(const std::string& topic, std::string& data)
         zmq_topic.rebuild(topic.size());
         zmq_message.rebuild(data.length());
     } catch (zmq::error_t& e) {
-        LOG_ERROR_DESCRIPTION("Failed to send data" + topic, e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to send data" + topic, e.what());
         return -1;
     }
 
@@ -198,10 +198,10 @@ int ZmqPipeline::Recv(const std::string& topic, std::string& data)
             data.assign(static_cast<char*>(zmq_msg.data()), zmq_msg.size());
 
             if (recv < 0)
-                LOG_WARNING("Failed to receive data!");
+                logger.LOG_WARNING("Failed to receive data!");
         }
     } catch (zmq::error_t& e) {
-        LOG_ERROR_DESCRIPTION("Failed to poll sockets", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to poll sockets", e.what());
         return -1;
     }
 
@@ -215,7 +215,7 @@ int ZmqPipeline::Serialize_Servos(std::string& output_string)
     proto_servos.set_right_servo(shared_data->servos.right_servo);
     proto_servos.set_left_servo(shared_data->servos.left_servo);
     if (!proto_servos.SerializeToString(&output_string)) {
-        LOG_ERROR("Failed to serialize servo values");
+        logger.LOG_ERROR("Failed to serialize servo values");
         return -1;
     }
 
@@ -227,7 +227,7 @@ int ZmqPipeline::Serialize_Uss(std::string& output_string)
     UltraSonicValues_Proto proto_uss;
     proto_uss.set_distance(shared_data->uss.distance);
     if (!proto_uss.SerializeToString(&output_string)) {
-        LOG_ERROR("Failed to serialize servo values");
+        logger.LOG_ERROR("Failed to serialize servo values");
         return -1;
     }
     return 0;
@@ -240,7 +240,7 @@ int ZmqPipeline::Deserialize_Uss(std::string& input_string, UltraSonicValues_Pro
         return -1;
 
     if (!uss.ParseFromString(input_string)) {
-        LOG_ERROR("Failed to deserialize ultra sonic values");
+        logger.LOG_ERROR("Failed to deserialize ultra sonic values");
         return -1;
     }
 
@@ -253,7 +253,7 @@ int ZmqPipeline::Deserialize_Servos(std::string& input_string, ServoValues_Proto
         return -1;
 
     if (!servos.ParseFromString(input_string)) {
-        LOG_ERROR("Failed to deserialize servo values");
+        logger.LOG_ERROR("Failed to deserialize servo values");
         return -1;
     }
 

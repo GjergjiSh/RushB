@@ -9,10 +9,12 @@ set(CMAKE_CXX_FLAGS
 "${CMAKE_CXX_FLAGS} -O3 -O2 -std=c++17 -Wno-deprecated-declarations"
 )
 
-set(MODULE_INTERFACE_DIR "../../include")
+set(CONTROL_CENTER_DIR "../../")
+set(MODULE_INTERFACE_DIR ${CONTROL_CENTER_DIR}/include)
 
 add_library(VideoPlayer SHARED .
     src/VideoPlayer.cpp
+    ${CONTROL_CENTER_DIR}/src/Logger.cpp
 )
 
 set_target_properties(VideoPlayer PROPERTIES

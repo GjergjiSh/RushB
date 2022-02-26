@@ -1,0 +1,4 @@
+catch errors for wrong parameters, out of map thing
+sigsev when error with object detector
+sighandler logging
+controller device stuff with logging format

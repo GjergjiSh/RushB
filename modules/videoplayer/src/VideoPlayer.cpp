@@ -3,12 +3,13 @@
 
 VideoPlayer::VideoPlayer()
 {
-    this->name = "VideoPlayer";
+    name = "VideoPlayer";
+    logger.Set_Name(name);
 }
 
 int VideoPlayer::Init()
 {
-    LOG_INFO("Initializing...");
+    logger.LOG_INFO("Initializing...");
     cv::namedWindow("Video Viewer");
 
     return 0;
@@ -28,7 +29,7 @@ int VideoPlayer::Cycle_Step()
 
 int VideoPlayer::Deinit()
 {
-    LOG_INFO("Deinitializing...");
+    logger.LOG_INFO("Deinitializing...");
     cv::destroyAllWindows();
     return 0;
 }

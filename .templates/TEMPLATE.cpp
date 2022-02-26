@@ -1,8 +1,8 @@
 #include "TEMPLATE.h"
 
 TEMPLATE::TEMPLATE() {
-    this->name="TEMPLATE";
-    logger = Logger("TEMPLATE");
+    name="TEMPLATE";
+    logger.Set_Name(name);
 }
 
 int TEMPLATE::Init()

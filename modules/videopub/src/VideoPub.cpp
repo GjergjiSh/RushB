@@ -1,12 +1,13 @@
 #include "VideoPub.h"
 
 VideoPub::VideoPub() {
-    this->name="VideoPub";
+    name="VideoPub";
+    logger.Set_Name(name);
 }
 
 int VideoPub::Init()
 {
-    LOG_INFO("Initializing...");
+    logger.LOG_INFO("Initializing...");
 
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;
@@ -21,7 +22,7 @@ int VideoPub::Cycle_Step()
 
 int VideoPub::Deinit()
 {
-    LOG_INFO("Deinitializing...");
+    logger.LOG_INFO("Deinitializing...");
     return Destroy_Pipeline();
 }
 
@@ -34,7 +35,7 @@ int VideoPub::Construct_Pipeline()
     if (Configure_Elements() != 0) return -1;
     if (Link_Elements() != 0) return -1;
 
-    LOG_INFO("Video pipeline successfuly constructed");
+    logger.LOG_INFO("Video pipeline successfuly constructed");
     return 0;
 }
 
@@ -54,7 +55,7 @@ int VideoPub::Create_Elements()
         !this->pipeline->rtph264pay ||
         !this->pipeline->udpsink) {
 
-        LOG_ERROR("Elements could not be created");
+        logger.LOG_ERROR("Elements could not be created");
         return -1;
     }
 
@@ -88,7 +89,7 @@ int VideoPub::Link_Elements()
         pipeline->x264enc,
         pipeline->rtph264pay,
         pipeline->udpsink, NULL)) {
-        LOG_ERROR("Elements could not be linked");
+        logger.LOG_ERROR("Elements could not be linked");
         gst_object_unref(pipeline->pipe);
         return -1;
     }
@@ -100,7 +101,7 @@ int VideoPub::Destroy_Pipeline()
     gst_element_set_state(this->pipeline->pipe, GST_STATE_NULL);
     gst_object_unref(GST_OBJECT(this->pipeline->pipe));
 
-    LOG_INFO("Video pipeline destroyed");
+    logger.LOG_INFO("Video pipeline destroyed");
     return 0;
 }
 
@@ -108,11 +109,11 @@ int VideoPub::Set_Pipeline_State_Playing()
 {
     GstStateChangeReturn ret = gst_element_set_state(pipeline->pipe, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {
-        LOG_ERROR("Unable to set the pipeline to the playing state");
+        logger.LOG_ERROR("Unable to set the pipeline to the playing state");
         gst_object_unref(pipeline->pipe);
         return -1;
     } else {
-        LOG_INFO("Video pipeline set to playing");
+        logger.LOG_INFO("Video pipeline set to playing");
     }
     return 0;
 }

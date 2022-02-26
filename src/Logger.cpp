@@ -1,8 +1,5 @@
 #include "Logger.h"
 
-Logger::Logger(std::string name)
-    : name(name){}
-
 void Logger::LOG_INFO(std::string msg)
 {
     std::stringstream msg_stream;
@@ -25,13 +22,18 @@ void Logger::LOG_ERROR_DESCRIPTION(std::string msg, std::string err)
 {
     std::stringstream msg_stream;
     msg_stream << name << TAG_END << " " << msg << err;
-    PRINT(INFO);
+    PRINT(ERROR);
 }
 void Logger::LOG_ERROR(std::string msg)
 {
     std::stringstream msg_stream;
     msg_stream << name << TAG_END << " " << msg;
     PRINT(ERROR);
+}
+
+void Logger::Set_Name(std::string name)
+{
+    this->name = name;
 }
 
 std::string Logger::Time_Stamp()

@@ -1,7 +1,8 @@
 #include "Controller.h"
 
 Controller::Controller() {
-    this->name="Controller";
+    name="Controller";
+    logger.Set_Name(name);
 }
 
 int Controller::Init()
@@ -26,7 +27,7 @@ int Controller::Cycle_Step()
 
 int Controller::Deinit()
 {
-    LOG_INFO("Deinitializing...");
+    logger.LOG_INFO("Deinitializing...");
     if (close(file_descriptor) != 0)
         return -1;
 
@@ -36,7 +37,7 @@ int Controller::Deinit()
 // Open file descriptor for the controller
 int Controller::Initialize_Device()
 {
-    LOG_INFO("Initializing...");
+    logger.LOG_INFO("Initializing...");
     char name[256] = "Unknown";
     if ((file_descriptor = open(device_path, O_RDONLY | O_NONBLOCK)) < 0) {
         fprintf(stderr, "[E][Controller] Cannot open %s: %s.\n", this->device_path, strerror(errno));

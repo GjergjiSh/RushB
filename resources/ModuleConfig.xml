@@ -8,21 +8,21 @@
             <parameter name="RIGHT_SERVO" value="100" />
             <parameter name="LEFT_SERVO" value="90" />
         </parameters>
-    </module> -->
+    </module>
 
-    <!-- <module name="Reader">
+    <module name="Reader">
         <parameters>
             <parameter name="HELLO" value="Reader says Hello World :)" />
         </parameters>
     </module> -->
 
-    <!-- <module name="Controller">
+    <module name="Controller">
         <parameters>
             <parameter name="DEVICE_PATH" value="/dev/input/by-id/usb-Inno_GamePad.._Inno_GamePad.._0000001-joystick" />
         </parameters>
-    </module> -->
+    </module>
 
-    <!-- <module name="ZmqPipeline">
+    <module name="ZmqPipeline">
         <parameters>
             <parameter name="REMOTE" value="127.0.0.1" />
             <parameter name="OUT_PORT" value="5001" />
@@ -30,27 +30,27 @@
             <parameter name="PUB_TOPIC" value="SERVOS" />
             <parameter name="SUB_TOPIC" value="USS" />
         </parameters>
-    </module> -->
+    </module>
 
-    <!-- <module name="VideoSub">
+    <module name="VideoSub">
         <parameters>
-            <parameter name="IN_PORT" value="5003" />
+            <parameter name="IN_PORT" value="5004" />
         </parameters>
-    </module> -->
+    </module>
 
-    <!-- <module name="VideoPub">
+    <module name="VideoPub">
         <parameters>
             <parameter name="CAMERA_INDEX" value="/dev/video0" />
             <parameter name="BITRATE" value="2000" />
             <parameter name="REMOTE_HOST" value="127.0.0.1" />
             <parameter name="OUT_PORT" value="5004" />
         </parameters>
-    </module> -->
+    </module>
 
-    <!-- <module name="VideoPlayer">
+    <module name="VideoPlayer">
         <parameters>
         </parameters>
-    </module> -->
+    </module>
 
     <!-- <module name="ObjectDetector">
         <parameters>
@@ -61,11 +61,11 @@
         </parameters>
     </module> -->
 
-    <!-- <module name="InoLink">
+    <module name="InoLink">
         <parameters>
             <parameter name="SERIAL_PORT" value="/dev/ttyACM0" />
             <parameter name="BAUD_RATE" value="50000" />
         </parameters>
-    </module> -->
+    </module>
 
 </modules>
