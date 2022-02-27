@@ -7,6 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -O2 -std=c++17 -Wno-deprecated-decla
 
 add_subdirectory(modules)
 
+option(BUILD_EXAMPLES "Building Example Modules" ON)
 if(BUILD_EXAMPLES)
     add_subdirectory(example-modules)
 endif()
