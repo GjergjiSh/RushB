@@ -24,10 +24,15 @@ int ModuleHandler::Init()
     // Initialize each loaded module
     auto start = std::chrono::system_clock::now();
     for (auto module : registered_modules) {
-        if (module->Init() != 0) {
-            logger.LOG_ERROR(std::string("Failed to initialize module: ").append(module->name));
+        try {
+            if (module->Init() != 0) {
+                logger.LOG_ERROR(std::string("Failed to initialize module: ").append(module->name));
+                return -1;
+            };
+        }catch(std::out_of_range& oor) {
+            logger.LOG_ERROR_DESCRIPTION(std::string("Failed to initialize module - Erronous configuration for module: ").append(module->name), oor.what());
             return -1;
-        };
+        }
     }
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
