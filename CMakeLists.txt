@@ -39,8 +39,7 @@ target_link_libraries(ControlCenter
 add_custom_command( TARGET ControlCenter POST_BUILD
         COMMENT echo "Setting up..."
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
-        COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/README.md
-        COMMAND echo "Place your modules in the avail_modules directory" >> ${CMAKE_CURRENT_BINARY_DIR}/README.md
+
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_SOURCE_DIR}/resources/ModuleConfig.xml
                 ${CMAKE_CURRENT_BINARY_DIR}/ModuleConfig.xml
