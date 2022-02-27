@@ -21,7 +21,7 @@ void Logger::LOG_WARNING(std::string msg)
 void Logger::LOG_ERROR_DESCRIPTION(std::string msg, std::string err)
 {
     std::stringstream msg_stream;
-    msg_stream << name << TAG_END << " " << msg << err;
+    msg_stream << name << TAG_END << " " << msg << " " << err;
     PRINT(ERROR);
 }
 void Logger::LOG_ERROR(std::string msg)
@@ -38,8 +38,14 @@ void Logger::Set_Name(std::string name)
 
 std::string Logger::Time_Stamp()
 {
-    std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    std::string str(30, '\0');
-    std::strftime(&str[0], str.size(), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
-    return str;
+    // get a precise timestamp as a string
+    const auto now = std::chrono::system_clock::now();
+    const auto now_as_time_t = std::chrono::system_clock::to_time_t(now);
+    const auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                           now.time_since_epoch()) % 1000;
+    std::stringstream timestamp;
+    timestamp
+        << std::put_time(std::localtime(&now_as_time_t), "%T")
+        << '.' << std::setfill('0') << std::setw(3) << now_ms.count();
+    return timestamp.str();
 }

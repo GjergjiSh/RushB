@@ -14,14 +14,17 @@ bool SignalHandler::Received_Exit_Sig()
 // Set exit signal to true.
 void SignalHandler::Exit(int)
 {
-    std::cout << "[I][SignalHandler] Received Interrput Signal" << std::endl;
+
     received_exit_sig = true;
 }
 
 // Set up the signal handlers for CTRL-C.
-void SignalHandler::Init()
+int SignalHandler::Init()
 {
+    logger.Set_Name("SignalHandler");
     if (signal((int)SIGINT, SignalHandler::Exit) == SIG_ERR) {
-        throw SignalException("[E][SignalHandler] Failed to set up signal handlers");
+        logger.LOG_ERROR("Failed to set up signal handler");
+        return -1;
     }
+    return 0;
 }

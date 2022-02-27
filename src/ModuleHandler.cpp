@@ -18,6 +18,9 @@ int ModuleHandler::Init()
     // Load the Modules in the lib folder
     if (Register_Modules() != 0) return -1;
 
+    // Initialize the signal handler
+    if (sig_handler.Init() !=0) return -1;
+
     // Initialize each loaded module
     auto start = std::chrono::system_clock::now();
     for (auto module : registered_modules) {
@@ -30,8 +33,6 @@ int ModuleHandler::Init()
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     logger.LOG_TIME_INFO("Initialized modules in ", elapsed.count());
 
-    // Initialize the signal handler
-    sig_handler.Init();
 
     logger.LOG_INFO("Initialization finished");
     return 0;
@@ -82,6 +83,7 @@ int ModuleHandler::Run()
         }
     }
 
+    logger.LOG_INFO("Exiting...");
     return 0;
 }
 

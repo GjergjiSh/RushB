@@ -40,12 +40,12 @@ int Controller::Initialize_Device()
     logger.LOG_INFO("Initializing...");
     char name[256] = "Unknown";
     if ((file_descriptor = open(device_path, O_RDONLY | O_NONBLOCK)) < 0) {
-        fprintf(stderr, "[E][Controller] Cannot open %s: %s.\n", this->device_path, strerror(errno));
+        logger.LOG_ERROR_DESCRIPTION(std::string("Cannot open ").append(device_path), strerror(errno));
         return -1;
     } else {
-        printf("[I][Controller] Device Recognized\n");
+        logger.LOG_INFO("Device Recognized");
         ioctl(file_descriptor, JSIOCGNAME(sizeof(name)), name);
-        printf("[I][Controller] Device name: %s\n", name);
+        logger.LOG_INFO(std::string("Device name: ").append(name));
     }
     return 0;
 }

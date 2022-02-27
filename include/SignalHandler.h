@@ -1,5 +1,8 @@
 #ifndef __SIGNALHANDLER_H__
 #define __SIGNALHANDLER_H_
+
+#include <Logger.h>
+
 #include <stdexcept>
 #include <iostream>
 
@@ -19,8 +22,10 @@ public:
     SignalHandler() = default;
     ~SignalHandler() = default;
 
-    void Init();
+    int Init();
     static void Exit(int);
     static bool Received_Exit_Sig();
+
+    Logger logger;
 };
 #endif /* __SIGNALHANDLER_H__ */
