@@ -2,7 +2,8 @@
 
 ZmqPipeline::ZmqPipeline()
 {
-    this->name = "ZmqPipeline";
+    name = "ZmqPipeline";
+    logger.Set_Name(name);
 
     publisher_funcs = {
         std::make_pair("USS", &ZmqPipeline::Publish_Uss),
