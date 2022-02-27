@@ -1,26 +1,28 @@
 #include "Reader.h"
-#include <stdio.h>
-#include <unistd.h>
+
+
 Reader::Reader() {
-    this->name="Reader";
+    name="Reader";
+    logger.Set_Name(name);
 }
 
 int Reader::Init()
 {
     try {
-    std::cout << parameters.at("HELLO") << std::endl;
+    logger.LOG_INFO(std::string("Reder says: ").append(parameters.at("HELLO")));
 
     } catch(std::exception& e) {
-        LOG_ERROR_DESCRIPTION("Failed to read parameter: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to read parameter: ", e.what());
+        return -1;
     }
     return 0;
 }
 
 int Reader::Cycle_Step()
 {
-    std::cout << "Top Servo: " << this->shared_data->servos.top_servo << std::endl;
-    std::cout << "Left Servo: " << this->shared_data->servos.left_servo << std::endl;
-    std::cout << "Right Servo: " << this->shared_data->servos.right_servo << std::endl;
+    logger.LOG_INFO(std::string("Top Servo: ").append(parameters.at(std::to_string(shared_data->servos.top_servo))));
+    logger.LOG_INFO(std::string("Left Servo: ").append(parameters.at(std::to_string(shared_data->servos.left_servo))));
+    logger.LOG_INFO(std::string("Right Servo: ").append(parameters.at(std::to_string(shared_data->servos.right_servo))));
 
     return 0;
 }

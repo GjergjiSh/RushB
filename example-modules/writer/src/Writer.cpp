@@ -2,7 +2,8 @@
 
 Writer::Writer()
 {
-    this->name = "Writer";
+    name = "Writer";
+    logger.Set_Name(name);
 }
 
 int Writer::Init()
@@ -10,9 +11,10 @@ int Writer::Init()
     try {
 
     } catch (std::exception& e) {
-        std::cout << "Top Servo Will be Set to: " << parameters.at("TOP_SERVO") << std::endl;
-        std::cout << "Left Servo Will be Set to: " << parameters.at("LEFT_SERVO") << std::endl;
-        std::cout << "Right Servo Will be Set to: " << parameters.at("RIGHT_SERVO") << std::endl;
+        logger.LOG_INFO(std::string("Top Servo Will be Set to: ").append(parameters.at("TOP_SERVO")));
+        logger.LOG_INFO(std::string("Left Servo Will be Set to: ").append(parameters.at("LEFT_SERVO")));
+        logger.LOG_INFO(std::string("Right Servo Will be Set to: ").append(parameters.at("RIGHT_SERVO")));
+
         return -1;
     }
     return 0;
@@ -26,7 +28,7 @@ int Writer::Cycle_Step()
         shared_data->servos.right_servo = stoi(this->parameters.at("RIGHT_SERVO"));
 
     } catch (std::exception& e) {
-        LOG_ERROR_DESCRIPTION("Failed to set servo values: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to set servo values: ", e.what());
         return -1;
     }
     return 0;
