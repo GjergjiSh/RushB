@@ -1,6 +1,5 @@
 #include "ModuleInterface.h"
 #include "ProtoModuleInterface.pb.h"
-#include "Logger.h"
 
 #include <zmq.hpp>
 
@@ -10,8 +9,6 @@ public:
     int Init(void) override;
     int Cycle_Step(void) override;
     int Deinit(void) override;
-
-    Logger logger;
 
 private:
     int Init_Connection();

@@ -1,6 +1,8 @@
 #ifndef MODULE_H
 #define MODULE_H
 
+#include "Logger.h"
+
 #include <iostream>
 #include <unordered_map>
 
@@ -50,6 +52,9 @@ public:
     std::unordered_map<std::string, std::string> parameters;
     void* lib_handle;
     SharedData_t* shared_data;
+
+    Logger logger;
+
 };
 
 // Factory Methods

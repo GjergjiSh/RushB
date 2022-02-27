@@ -1,5 +1,4 @@
 #include "ModuleInterface.h"
-#include "Logger.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
@@ -12,8 +11,6 @@ public:
     int Init(void) override;
     int Cycle_Step(void) override;
     int Deinit(void) override;
-
-    Logger logger;
 
 private:
     cv::Mat frame_bgr;

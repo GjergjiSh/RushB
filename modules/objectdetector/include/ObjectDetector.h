@@ -7,7 +7,6 @@
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/graph/graph_def_builder.h"
 #include "tensorflow/core/public/session.h"
-#include "Logger.h"
 
 class ObjectDetector : public Module {
 
@@ -17,7 +16,6 @@ public:
     int Cycle_Step(void) override;
     int Deinit(void) override;
 
-    Logger logger;
 private:
 
     std::vector<DetectionUtils::tBoundingBox> Detect(cv::Mat&, bool draw);

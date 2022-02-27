@@ -15,7 +15,6 @@
     autovideosink
 
  ****************************************************************************************/
-typedef void (*ReceivedSample_t)(const void *const data, const size_t size);
 
 typedef struct
 {
@@ -28,7 +27,6 @@ typedef struct
     GstElement* queue;
     GstElement* convert_filter;
     GstElement* videosink;
-    ReceivedSample_t Received_Sample;
 } VideoPipeline_t;
 
 class VideoSub : public Module {
@@ -39,7 +37,6 @@ public:
     int Cycle_Step(void) override;
     int Deinit(void) override;
 
-    Logger logger;
     std::mutex video_mutex;
 
 private:

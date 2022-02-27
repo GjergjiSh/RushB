@@ -1,5 +1,4 @@
 #include "ModuleInterface.h"
-#include "Logger.h"
 
 #include <gst/gst.h>
 #include <memory>
@@ -33,8 +32,6 @@ public:
     int Init(void) override;
     int Cycle_Step(void) override;
     int Deinit(void) override;
-
-    Logger logger;
 
 private:
     int Construct_Pipeline();

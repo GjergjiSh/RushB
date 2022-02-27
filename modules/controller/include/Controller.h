@@ -2,7 +2,6 @@
 #define CONTROLLER_H
 
 #include "ModuleInterface.h"
-#include "Logger.h"
 
 #include <linux/joystick.h>
 #include <errno.h>
@@ -53,8 +52,6 @@ public:
     int Process_Input();
     int Initialize_Device();
     void Print_Driver_Wish();
-
-    Logger logger;
 
 private:
     void Handle_Button_Events();

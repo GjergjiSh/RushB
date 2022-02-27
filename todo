@@ -1,5 +1,6 @@
-catch errors for wrong parameters, out of map thing
+
 sigsev when error with object detector
+videopub doesnt have logger
 
 # Ideas for the future
 
