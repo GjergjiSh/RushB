@@ -1,7 +1,7 @@
 #ifndef __SIGNALHANDLER_H__
 #define __SIGNALHANDLER_H_
 
-#include <Logger.h>
+#include "Logger.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -26,6 +26,6 @@ public:
     static void Exit(int);
     static bool Received_Exit_Sig();
 
-    Logger logger;
+    RBLogger::Logger logger;
 };
 #endif /* __SIGNALHANDLER_H__ */

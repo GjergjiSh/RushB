@@ -1,5 +1,4 @@
 #include "ModuleInterface.h"
-#include "Logger.h"
 
 #include <gst/gst.h>
 #include <mutex>

@@ -10,18 +10,20 @@
 #include <ctime>
 #include <iomanip>
 
+namespace RBLogger {
 
-#define TAG_END "]\033[0m"
-#define ERROR "\033[1;31m[E]["
-#define INFO "\033[1;36m[I]["
-#define WARNING "\033[1;33m[W]["
+#define PRINT(tag) std::cout << "["              \
+                             << Time_Stamp()     \
+                             << "] "             \
+                             << tag              \
+                             << msg_stream.str() \
+                             << std::endl
 
-#define PRINT(tag) std::cout << "[" \
-                        << Time_Stamp() \
-                        << "] " \
-                        << tag \
-                        << msg_stream.str() \
-                        << std::endl
+
+const std::string TAG_END = "]\033[0m";
+const std::string ERROR = "\033[1;31m[E][";
+const std::string INFO = "\033[1;36m[I][";
+const std::string WARNING = "\033[1;33m[W][";
 
 class Logger {
 
@@ -42,5 +44,6 @@ public:
 private:
     std::string name;
 };
+}
 
 #endif /* LOGGER_H */

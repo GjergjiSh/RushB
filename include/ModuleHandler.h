@@ -34,7 +34,7 @@ private:
     std::vector<Module*> registered_modules;
     SharedData_t shared_data;
     SignalHandler sig_handler;
-    Logger logger;
+    RBLogger::Logger logger;
 };
 
 #endif /* MODULEHANDLER_H */

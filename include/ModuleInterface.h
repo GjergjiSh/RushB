@@ -53,7 +53,7 @@ public:
     void* lib_handle;
     SharedData_t* shared_data;
 
-    Logger logger;
+    RBLogger::Logger logger;
 
 };
 

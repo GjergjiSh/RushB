@@ -24,7 +24,7 @@ static GstBusSyncReply Bus_Message_Callback(GstBus* bus, GstMessage* message, gp
  * in decodebin's case that is media being decoded. gst-launch will do this sort of thing automagically,
  * but in code you need to register a callback, and then link the pad in that callback
  ********************************************************************************************************************************/
-static void Pad_Callback(GstElement* element, GstPad* pad, gpointer data, VideoSub* video_sub)
+static void Pad_Callback(GstElement* element, GstPad* pad, gpointer data)
 {
     gchar* name;
     GstCaps* caps;
@@ -32,7 +32,7 @@ static void Pad_Callback(GstElement* element, GstPad* pad, gpointer data, VideoS
     GstElement* video_convert;
 
     name = gst_pad_get_name(pad);
-    g_print("[I][VideoPipeline] A new pad %s was created\n", name);
+    //video_sub->logger.LOG_INFO(std::string("A new pad was created"));
 
     caps = gst_pad_get_pad_template_caps(pad);
     description = gst_caps_to_string(caps);
@@ -41,13 +41,14 @@ static void Pad_Callback(GstElement* element, GstPad* pad, gpointer data, VideoS
     video_convert = GST_ELEMENT(data);
 
     if (!gst_element_link_pads(element, name, video_convert, "sink")) {
-        video_sub->logger.LOG_ERROR("Failed to link decidebin and autoconvert");
+        //video_sub->logger.LOG_ERROR("Failed to link decidebin and autoconvert");
     }
 
     g_free(name);
 }
 
-
+// This callback gets called whenever data reaches the sink of the pipeline
+// The video shared data is updated accordingly
 static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_sub)
 {
     GstSample* sample;
@@ -68,6 +69,7 @@ static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_
             return GST_FLOW_ERROR;
         }
 
+       // Write the received video data into the shared memory
        std::scoped_lock<std::mutex> lock(video_sub->video_mutex); {
            memcpy(video_sub->shared_data->video.frame, map.data, map.size);
            gst_buffer_unmap(buffer, &map);
@@ -84,7 +86,7 @@ VideoSub::VideoSub() {
 
 int VideoSub::Init()
 {
-    logger.LOG_INFO("Initializing...");
+    logger.LOG_INFO("Video Sub Initializing...");
 
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;

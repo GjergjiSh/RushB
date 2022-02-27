@@ -1,51 +1,57 @@
 #include "Logger.h"
 
-void Logger::LOG_INFO(std::string msg)
+
+void RBLogger::Logger::LOG_INFO(std::string msg)
 {
     std::stringstream msg_stream;
     msg_stream << name << TAG_END << " " << msg;
-    PRINT(INFO);
+    PRINT(RBLogger::INFO);
 }
-void Logger::LOG_TIME_INFO(std::string msg, int time)
+void RBLogger::Logger::LOG_TIME_INFO(std::string msg, int time)
 {
     std::stringstream msg_stream;
     msg_stream << name << TAG_END << " " << msg << time << " [ms]";
-    PRINT(INFO);
+    PRINT(RBLogger::INFO);
 }
-void Logger::LOG_WARNING(std::string msg)
+void RBLogger::Logger::LOG_WARNING(std::string msg)
 {
     std::stringstream msg_stream;
     msg_stream << name << TAG_END << " " << msg;
-    PRINT(WARNING);
+    PRINT(RBLogger::WARNING);
 }
-void Logger::LOG_ERROR_DESCRIPTION(std::string msg, std::string err)
+void RBLogger::Logger::LOG_ERROR_DESCRIPTION(std::string msg, std::string err)
 {
     std::stringstream msg_stream;
     msg_stream << name << TAG_END << " " << msg << " " << err;
-    PRINT(ERROR);
+    PRINT(RBLogger::ERROR);
 }
-void Logger::LOG_ERROR(std::string msg)
+void RBLogger::Logger::LOG_ERROR(std::string msg)
 {
     std::stringstream msg_stream;
     msg_stream << name << TAG_END << " " << msg;
-    PRINT(ERROR);
+    PRINT(RBLogger::ERROR);
 }
 
-void Logger::Set_Name(std::string name)
+void RBLogger::Logger::Set_Name(std::string name)
 {
     this->name = name;
 }
 
-std::string Logger::Time_Stamp()
+std::string RBLogger::Logger::Time_Stamp()
 {
     // get a precise timestamp as a string
     const auto now = std::chrono::system_clock::now();
     const auto now_as_time_t = std::chrono::system_clock::to_time_t(now);
     const auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                            now.time_since_epoch()) % 1000;
+
+    // Format the timestamp
     std::stringstream timestamp;
-    timestamp
-        << std::put_time(std::localtime(&now_as_time_t), "%T")
-        << '.' << std::setfill('0') << std::setw(3) << now_ms.count();
+    timestamp << std::put_time(std::localtime(&now_as_time_t), "%T")
+              << '.'
+              << std::setfill('0')
+              << std::setw(3)
+              << now_ms.count();
+
     return timestamp.str();
 }
