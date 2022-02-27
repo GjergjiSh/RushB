@@ -28,10 +28,6 @@ target_include_directories(VideoPub PRIVATE .
     /usr/lib/x86_64-linux-gnu/glib-2.0/include
 )
 
-link_directories(
-    /usr/local/lib
-)
-
 target_link_libraries( VideoPub
     -lgstreamer-1.0
     -lgobject-2.0
