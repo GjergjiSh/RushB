@@ -35,7 +35,7 @@ int VideoPlayer::Deinit()
 }
 
 // Factory Method
-extern "C" std::shared_ptr<Module> Create_Instance()
+std::shared_ptr<Module> Create_Instance()
 {
     return std::make_shared<VideoPlayer>();
 }

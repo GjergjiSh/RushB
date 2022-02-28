@@ -112,7 +112,6 @@ int ModuleHandler::Register_Modules()
         dlerror();
 
         // load the Create Symbol of the Module
-        //Create_t* Create_Module = (Create_t*)dlsym(lib_handle, "Create");
         auto Create_Module = (Create_t*)dlsym(lib_handle, "Create_Instance");
         const char* dlsym_error = dlerror();
         if (dlsym_error) {

@@ -88,7 +88,7 @@ int InoLink::Write_Servo_Vals()
 }
 
 // Factory Method
-extern "C" std::shared_ptr<Module> Create_Instance()
+std::shared_ptr<Module> Create_Instance()
 {
     return std::make_shared<InoLink>();
 }

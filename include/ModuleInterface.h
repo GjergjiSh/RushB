@@ -61,4 +61,8 @@ public:
 // Factory Methods
 typedef std::shared_ptr<Module> Create_t();
 
+extern "C" {
+    std::shared_ptr<Module>Create_Instance();
+}
+
 #endif /* MODULE_H */

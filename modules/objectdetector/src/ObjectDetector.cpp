@@ -200,7 +200,7 @@ tensorflow::Tensor ObjectDetector::Convert_Mat_To_Tensor(cv::Mat src)
 }
 
 // Factory Method
-extern "C" std::shared_ptr<Module> Create_Instance()
+std::shared_ptr<Module> Create_Instance()
 {
     return std::make_shared<ObjectDetector>();
 }
