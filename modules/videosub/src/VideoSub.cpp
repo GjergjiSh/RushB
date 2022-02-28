@@ -96,6 +96,7 @@ int VideoSub::Init()
 
 int VideoSub::Cycle_Step()
 {
+    /* Video recv and decompression handled in gstreamer pipeline */
     return 0;
 }
 
@@ -107,7 +108,7 @@ int VideoSub::Deinit()
 
 int VideoSub::Construct_Pipeline()
 {
-    m_pipeline = new VideoPipeline_t();
+    m_pipeline = std::make_shared<VideoPipeline_t>();
 
     gst_init(NULL, NULL);
 
@@ -142,7 +143,6 @@ int VideoSub::Create_Elements()
         !m_pipeline->videosink) {
         logger.Error("Failed to create all pipeline elements");
 
-        delete m_pipeline;
         return -1;
     }
 
@@ -202,7 +202,7 @@ int VideoSub::Link_Elements()
             m_pipeline->decodebin, NULL)) {
         logger.Error("Failed to link first branch of pipeline elements");
 
-        delete m_pipeline;
+
         return -1;
     }
 
@@ -215,7 +215,7 @@ int VideoSub::Link_Elements()
             m_pipeline->videosink, NULL)) {
         logger.Error("Failed to link second branch of pipeline elements");
 
-        delete m_pipeline;
+
         return -1;
     }
 
@@ -227,12 +227,11 @@ int VideoSub::Destroy_Pipeline()
     GstStateChangeReturn ret = gst_element_set_state(m_pipeline->pipe, GST_STATE_NULL);
     if (ret == GST_STATE_CHANGE_FAILURE) {
         logger.Error("Failed to destroy the video pipeline");
-        delete m_pipeline;
+
         return -1;
     }
 
     logger.Info("Subscriber video pipeline destroyed");
-    delete m_pipeline;
     return 0;
 }
 
@@ -242,8 +241,6 @@ int VideoSub::Set_Pipeline_State_Playing()
     GstStateChangeReturn ret = gst_element_set_state(m_pipeline->pipe, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {
         logger.Error("Unable to set the pipeline to the playing m_state");
-
-        delete m_pipeline;
         return -1;
     }
 
