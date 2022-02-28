@@ -58,7 +58,7 @@ int ModuleHandler::Deinit()
 // Trigger cycle for each registered module
 int ModuleHandler::Run()
 {
-    while (!sig_handler.Received_Exit_Sig()) {
+   // while (!sig_handler.Received_Exit_Sig()) {
         for (auto module : registered_modules) {
             if (verbose) {
                 // Print cycle time for each module
@@ -78,7 +78,7 @@ int ModuleHandler::Run()
                 };
             }
         }
-    }
+   // }
 
     logger.LOG_INFO("Exiting...");
     return 0;

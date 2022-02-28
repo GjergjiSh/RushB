@@ -1,7 +1,7 @@
+#include <zmq.hpp>
+
 #include "ModuleInterface.h"
 #include "ProtoModuleInterface.pb.h"
-
-#include <zmq.hpp>
 
 class ZmqPipeline : public Module {
 public:

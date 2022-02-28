@@ -1,18 +1,18 @@
 #ifndef MODULEHANDLER_H
 #define MODULEHANDLER_H
 
-#include "Logger.h"
-#include "ModuleInterface.h"
-#include "SignalHandler.h"
-
 #include <dlfcn.h>
+#include <string.h>
+
 #include <filesystem>
 #include <iostream>
-#include <memory>
 #include <pugixml.hpp>
 #include <unordered_map>
 #include <vector>
-#include <string.h>
+
+#include "Logger.h"
+#include "ModuleInterface.h"
+#include "SignalHandler.h"
 
 class ModuleHandler {
 public:

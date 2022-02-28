@@ -1,10 +1,10 @@
 #ifndef __SIGNALHANDLER_H__
 #define __SIGNALHANDLER_H_
 
-#include "Logger.h"
-
 #include <stdexcept>
 #include <iostream>
+
+#include "Logger.h"
 
 using std::runtime_error;
 

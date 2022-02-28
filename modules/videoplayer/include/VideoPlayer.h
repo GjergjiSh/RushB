@@ -1,8 +1,8 @@
-#include "ModuleInterface.h"
-
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+
+#include "ModuleInterface.h"
 
 class VideoPlayer : public Module {
 

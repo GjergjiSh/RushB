@@ -1,7 +1,6 @@
-#include "ModuleInterface.h"
-
 #include <gst/gst.h>
-#include <memory>
+
+#include "ModuleInterface.h"
 
 /**************************************    Pipeline    *********************************
 

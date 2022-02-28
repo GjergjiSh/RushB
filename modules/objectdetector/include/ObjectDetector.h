@@ -40,12 +40,12 @@ private:
 
     const std::string graph_input_node = "serving_default_input_tensor:0";
     std::vector<std::string> graph_output_nodes = {
-        {   "StatefulPartitionedCall:0", //detection_anchor_indices
+           {"StatefulPartitionedCall:0", //detection_anchor_indices
             "StatefulPartitionedCall:1", //detection_boxes
             "StatefulPartitionedCall:2", //detection_classes
             "StatefulPartitionedCall:3", //detection_multiclass_confidences
             "StatefulPartitionedCall:4", //detection_confidences
-            "StatefulPartitionedCall:5" } //num_detections
+            "StatefulPartitionedCall:5"} //num_detections
     };
 
     DetectionUtils::inference_time_result_t inference_time_result = {};

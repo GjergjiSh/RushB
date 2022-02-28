@@ -1,7 +1,7 @@
-#include "ModuleInterface.h"
-
 #include <CppLinuxSerial/Exception.hpp>
 #include <CppLinuxSerial/SerialPort.hpp>
+
+#include "ModuleInterface.h"
 
 class InoLink : public Module {
 

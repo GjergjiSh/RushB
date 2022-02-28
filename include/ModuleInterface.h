@@ -1,11 +1,11 @@
 #ifndef MODULE_H
 #define MODULE_H
 
-#include "Logger.h"
 #include <memory>
-
 #include <iostream>
 #include <unordered_map>
+
+#include "Logger.h"
 
 #define IMAGE_1920X1080_R8G8B8 (1920 * 1080 * 3)
 
