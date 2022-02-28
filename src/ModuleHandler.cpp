@@ -2,15 +2,15 @@
 #include  <chrono>
 
 ModuleHandler::ModuleHandler(const char* modules_cfg, bool verbose)
-    : modules_cfg(modules_cfg), verbose(verbose)
+    : m_modules_cfg(modules_cfg), m_verbose(verbose)
     {
-        logger.Set_Name("ModuleHandler");
+        m_logger.Set_Name("ModuleHandler");
     }
 
 int ModuleHandler::Init()
 {
     // Init values of shared data members to 0
-    memset(&shared_data, 0, sizeof(shared_data));
+    memset(&m_shared_data, 0, sizeof(m_shared_data));
 
     // Parse the XML Configuration File
     if (Parse_Configuration() != 0) return -1;
@@ -19,78 +19,78 @@ int ModuleHandler::Init()
     if (Register_Modules() != 0) return -1;
 
     // Initialize the signal handler
-    if (sig_handler.Init() !=0) return -1;
+    if (m_sig_handler.Init() != 0) return -1;
 
     // Initialize each loaded module
     auto start = std::chrono::system_clock::now();
-    for (auto module : registered_modules) {
+    for (auto module : m_registered_modules) {
         try {
             if (module->Init() != 0) {
-                logger.LOG_ERROR(std::string("Failed to initialize module: ").append(module->name));
+                m_logger.LOG_ERROR(std::string("Failed to initialize module: ").append(module->name));
                 return -1;
             };
         }catch(std::out_of_range& oor) {
-            logger.LOG_ERROR_DESCRIPTION(std::string("Failed to initialize module - Erronous configuration for module: ").append(module->name), oor.what());
+            m_logger.LOG_ERROR_DESCRIPTION(std::string("Failed to initialize module - Erronous configuration for module: ").append(module->name), oor.what());
             return -1;
         }
     }
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    logger.LOG_TIME_INFO("Initialized modules in ", elapsed.count());
+    m_logger.LOG_TIME_INFO("Initialized modules in ", elapsed.count());
 
 
-    logger.LOG_INFO("Initialization finished");
+    m_logger.LOG_INFO("Initialization finished");
     return 0;
 }
 
 int ModuleHandler::Deinit()
 {
-    for (auto module : registered_modules) {
+    for (auto module : m_registered_modules) {
         module->Deinit();
 
         if (dlclose(module->lib_handle) != 0)
-            logger.LOG_ERROR_DESCRIPTION("Failed to destroy module :", dlerror());
+            m_logger.LOG_ERROR_DESCRIPTION("Failed to destroy module :", dlerror());
     }
-    logger.LOG_INFO("Deinitialization finished");
+    m_logger.LOG_INFO("Deinitialization finished");
     return 0;
 }
 
 // Trigger cycle for each registered module
 int ModuleHandler::Run()
 {
-   // while (!sig_handler.Received_Exit_Sig()) {
-        for (auto module : registered_modules) {
-            if (verbose) {
+    while (!m_sig_handler.Received_Exit_Sig()) {
+        for (auto module : m_registered_modules) {
+            if (m_verbose) {
                 // Print cycle time for each module
                 auto start = std::chrono::system_clock::now();
                 if (module->Cycle_Step() != 0) {
-                    logger.LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
+                    m_logger.LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
                     return -1;
                 };
                 auto end = std::chrono::system_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                logger.LOG_TIME_INFO(std::string("Cycle target: ").append(module->name), elapsed.count());
+                m_logger.LOG_TIME_INFO(std::string("Cycle target: ").append(module->name), elapsed.count());
             } else {
                 // Trigger cycle without printing time info
                 if (module->Cycle_Step() != 0) {
-                    logger.LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
+                    m_logger.LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
                     return -1;
                 };
             }
         }
-   // }
+    }
 
-    logger.LOG_INFO("Exiting...");
+    m_logger.LOG_INFO("Exiting...");
     return 0;
 }
 
 int ModuleHandler::Parse_Configuration()
 {
     // Load XML config file into memory
-    pugi::xml_parse_result parse_result = modules_xml.load_file(modules_cfg);
+    pugi::xml_parse_result parse_result = m_modules_xml.load_file(m_modules_cfg);
     if (!parse_result) {
-        logger.LOG_ERROR_DESCRIPTION("Failed to parse the modules configuration file",
-            parse_result.description());
+        m_logger.LOG_ERROR_DESCRIPTION("Failed to parse the modules configuration file",
+                                       parse_result.description());
         return -1;
     }
     return 0;
@@ -104,7 +104,7 @@ int ModuleHandler::Register_Modules()
         // Load the library
         void* lib_handle = dlopen(entry.path().c_str(), RTLD_LAZY);
         if (!lib_handle) {
-            logger.LOG_ERROR_DESCRIPTION("Failed to load library: ", dlerror());
+            m_logger.LOG_ERROR_DESCRIPTION("Failed to load library: ", dlerror());
             return -1;
         }
 
@@ -115,17 +115,17 @@ int ModuleHandler::Register_Modules()
         auto Create_Module = (Create_t*)dlsym(lib_handle, "Create_Instance");
         const char* dlsym_error = dlerror();
         if (dlsym_error) {
-            logger.LOG_ERROR_DESCRIPTION("Failed to load symbol create: ", dlsym_error);
+            m_logger.LOG_ERROR_DESCRIPTION("Failed to load symbol create: ", dlsym_error);
             return -1;
         }
 
         // Create the Module Instance
         std::shared_ptr<Module> module = Create_Module();
         module->lib_handle = lib_handle;
-        module->shared_data = &shared_data;
+        module->shared_data = &m_shared_data;
 
         // Only register if the module is in the XML config
-        pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name.c_str());
+        pugi::xml_node module_node = m_modules_xml.child("modules").find_child_by_attribute("name", module->name.c_str());
         if (!module_node) {
             //delete module;
             continue;
@@ -135,19 +135,19 @@ int ModuleHandler::Register_Modules()
         Assign_Module_Parameters(module);
 
         // Register the Module Instance
-        registered_modules.push_back(module);
+        m_registered_modules.push_back(module);
     }
 
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    logger.LOG_TIME_INFO("Finished registering modules in ", elapsed.count());
+    m_logger.LOG_TIME_INFO("Finished registering modules in ", elapsed.count());
     return 0;
 }
 
 int ModuleHandler::Assign_Module_Parameters(std::shared_ptr<Module> module)
 {
     // Find the module's node in the XML config file
-    pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name.c_str());
+    pugi::xml_node module_node = m_modules_xml.child("modules").find_child_by_attribute("name", module->name.c_str());
     pugi::xml_node parameters_node = module_node.child("parameters");
 
     // Assign the parameter names and values to the module
@@ -165,7 +165,7 @@ int ModuleHandler::Assign_Module_Parameters(std::shared_ptr<Module> module)
 void ModuleHandler::Print_Module_Parameters(std::shared_ptr<Module> module)
 {
     for (auto parameter : module->parameters) {
-        std::cout << "[" << logger.Time_Stamp() << "] "
+        std::cout << "[" << m_logger.Time_Stamp() << "] "
                   << "\033[1;36m[I][ModuleHandler]\033[0m "
                   <<  module->name << " -> "
                   << " Parameter: " << parameter.first

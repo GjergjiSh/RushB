@@ -42,7 +42,7 @@ public:
     std::string Time_Stamp();
 
 private:
-    std::string name;
+    std::string m_name;
 };
 }
 

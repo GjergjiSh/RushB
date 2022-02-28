@@ -40,5 +40,5 @@ private:
     int Configure_Elements();
     int Link_Elements();
 
-    std::shared_ptr<VideoPipeline_t> pipeline;
+    std::shared_ptr<VideoPipeline_t> m_pipeline;
 };

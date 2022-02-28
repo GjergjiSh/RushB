@@ -29,17 +29,17 @@ private:
     tensorflow::Tensor Convert_Mat_To_Tensor(cv::Mat src);
 
     std::vector<std::string> labels;
-    const char* model_path;
-    const char* label_path;
+    const char* m_model_path;
+    const char* m_label_path;
     const char* estimator_config_path;
-    float confidence_threshold;
+    float m_confidence_threshold;
 
-    tensorflow::SavedModelBundle saved_model;
-    tensorflow::SessionOptions session_options;
-    tensorflow::RunOptions run_options;
+    tensorflow::SavedModelBundle m_saved_model;
+    tensorflow::SessionOptions m_session_options;
+    tensorflow::RunOptions m_run_options;
 
-    const std::string graph_input_node = "serving_default_input_tensor:0";
-    std::vector<std::string> graph_output_nodes = {
+    const std::string m_graph_input_node = "serving_default_input_tensor:0";
+    std::vector<std::string> m_graph_output_nodes = {
            {"StatefulPartitionedCall:0", //detection_anchor_indices
             "StatefulPartitionedCall:1", //detection_boxes
             "StatefulPartitionedCall:2", //detection_classes
@@ -48,6 +48,6 @@ private:
             "StatefulPartitionedCall:5"} //num_detections
     };
 
-    DetectionUtils::inference_time_result_t inference_time_result = {};
-    bool time_log;
+    DetectionUtils::inference_time_result_t m_inference_time_result = {};
+    bool m_time_log;
 };

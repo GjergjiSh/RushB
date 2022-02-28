@@ -13,6 +13,6 @@ public:
     int Deinit(void) override;
 
 private:
-    cv::Mat frame_bgr;
-    cv::Mat frame_rgb;
+    cv::Mat m_frame_bgr;
+    cv::Mat m_frame_rgb;
 };

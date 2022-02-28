@@ -17,5 +17,5 @@ private:
     std::string Convert_Servo_Vals();
     int Write_Servo_Vals();
 
-    mn::CppLinuxSerial::SerialPort* serial_port;
+    mn::CppLinuxSerial::SerialPort* m_serial_port;
 };

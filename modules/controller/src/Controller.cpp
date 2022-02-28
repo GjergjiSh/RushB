@@ -7,7 +7,7 @@ Controller::Controller() {
 
 int Controller::Init()
 {
-    device_path = parameters.at("DEVICE_PATH").c_str();
+    m_device_path = parameters.at("DEVICE_PATH").c_str();
     if (Initialize_Device() != 0)
         return -1;
 
@@ -18,8 +18,8 @@ int Controller::Cycle_Step()
 {
     Process_Input();
 
-    shared_data->servos.left_servo = state.stick_coordinates[LEFTSTICK].y;
-    shared_data->servos.right_servo = state.stick_coordinates[RIGHTSTICK].x;
+    shared_data->servos.left_servo = m_state.stick_coordinates[LEFTSTICK].y;
+    shared_data->servos.right_servo = m_state.stick_coordinates[RIGHTSTICK].x;
 
     // missing stuff for top servo
     return 0;
@@ -28,7 +28,7 @@ int Controller::Cycle_Step()
 int Controller::Deinit()
 {
     logger.LOG_INFO("Deinitializing...");
-    if (close(file_descriptor) != 0)
+    if (close(m_file_descriptor) != 0)
         return -1;
 
     return 0;
@@ -39,12 +39,12 @@ int Controller::Initialize_Device()
 {
     logger.LOG_INFO("Initializing...");
     char name[256] = "Unknown";
-    if ((file_descriptor = open(device_path, O_RDONLY | O_NONBLOCK)) < 0) {
-        logger.LOG_ERROR_DESCRIPTION(std::string("Cannot open ").append(device_path), strerror(errno));
+    if ((m_file_descriptor = open(m_device_path, O_RDONLY | O_NONBLOCK)) < 0) {
+        logger.LOG_ERROR_DESCRIPTION(std::string("Cannot open ").append(m_device_path), strerror(errno));
         return -1;
     } else {
         logger.LOG_INFO("Device Recognized");
-        ioctl(file_descriptor, JSIOCGNAME(sizeof(name)), name);
+        ioctl(m_file_descriptor, JSIOCGNAME(sizeof(name)), name);
         logger.LOG_INFO(std::string("Device name: ").append(name));
     }
     return 0;
@@ -53,9 +53,9 @@ int Controller::Initialize_Device()
 // Check if the device is still connected
 bool Controller::Connected()
 {
-    js_event* ev = &event;
+    js_event* ev = &m_event;
     ssize_t bytes;
-    bytes = read(file_descriptor, ev, sizeof(*ev));
+    bytes = read(m_file_descriptor, ev, sizeof(*ev));
     if (bytes == sizeof(*ev)) {
         return true;
     }
@@ -65,24 +65,24 @@ bool Controller::Connected()
 // Update the coordiantes of the thumbsticks, normalized between -100 and 100
 void Controller::Handle_Thumbstick_Events()
 {
-    size_t thumbstick = event.number / 2;
-    if (event.number % 2 == 0)
-        state.stick_coordinates[thumbstick].x = -1 * ((event.value) / MAX_COORD_VAL);
+    size_t thumbstick = m_event.number / 2;
+    if (m_event.number % 2 == 0)
+        m_state.stick_coordinates[thumbstick].x = -1 * ((m_event.value) / MAX_COORD_VAL);
     else
-        state.stick_coordinates[thumbstick].y = -1 * ((event.value) / MAX_COORD_VAL);
+        m_state.stick_coordinates[thumbstick].y = -1 * ((m_event.value) / MAX_COORD_VAL);
 }
 
-// Update the state of the buttons
+// Update the m_state of the buttons
 void Controller::Handle_Button_Events()
 {
-    state.buttons.at(event.number) = event.value;
+    m_state.buttons.at(m_event.number) = m_event.value;
 }
 
-// Read event if device is connected and update controller state
+// Read m_event if device is connected and update controller m_state
 int Controller::Process_Input()
 {
     if (Connected()) {
-        switch (event.type) {
+        switch (m_event.type) {
         case JS_EVENT_BUTTON:
             Handle_Button_Events();
         case JS_EVENT_AXIS:

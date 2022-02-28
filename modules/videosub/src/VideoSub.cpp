@@ -41,7 +41,7 @@ static void Pad_Callback(GstElement* element, GstPad* pad, gpointer data)
     video_convert = GST_ELEMENT(data);
 
     if (!gst_element_link_pads(element, name, video_convert, "sink")) {
-        //video_sub->logger.LOG_ERROR("Failed to link decidebin and autoconvert");
+        //video_sub->logger.LOG_ERROR("Failed to link decodebin and autoconvert");
     }
 
     g_free(name);
@@ -107,7 +107,7 @@ int VideoSub::Deinit()
 
 int VideoSub::Construct_Pipeline()
 {
-    pipeline = new VideoPipeline_t();
+    m_pipeline = new VideoPipeline_t();
 
     gst_init(NULL, NULL);
 
@@ -115,47 +115,47 @@ int VideoSub::Construct_Pipeline()
     if (Configure_Elements() != 0) return -1;
     if (Link_Elements() != 0) return -1;
 
-    logger.LOG_INFO("Video Pipeline successfuly constructed");
+    logger.LOG_INFO("Video Pipeline successfully constructed");
     return 0;
 }
 
 int VideoSub::Create_Elements()
 {
-    pipeline->pipe = gst_pipeline_new("Subscriber Video Pipeline");
-    pipeline->udpsrc = gst_element_factory_make("udpsrc", NULL);
-    pipeline->filter = gst_element_factory_make("capsfilter", NULL);
-    pipeline->rtph264depay = gst_element_factory_make("rtph264depay", NULL);
-    pipeline->decodebin = gst_element_factory_make("decodebin", NULL);
-    pipeline->videoconvert = gst_element_factory_make("videoconvert", NULL);
-    pipeline->convert_filter = gst_element_factory_make("capsfilter", NULL);
-    pipeline->queue = gst_element_factory_make("queue", NULL);
-    pipeline->videosink = gst_element_factory_make("appsink", NULL);
+    m_pipeline->pipe = gst_pipeline_new("Subscriber Video Pipeline");
+    m_pipeline->udpsrc = gst_element_factory_make("udpsrc", NULL);
+    m_pipeline->filter = gst_element_factory_make("capsfilter", NULL);
+    m_pipeline->rtph264depay = gst_element_factory_make("rtph264depay", NULL);
+    m_pipeline->decodebin = gst_element_factory_make("decodebin", NULL);
+    m_pipeline->videoconvert = gst_element_factory_make("videoconvert", NULL);
+    m_pipeline->convert_filter = gst_element_factory_make("capsfilter", NULL);
+    m_pipeline->queue = gst_element_factory_make("queue", NULL);
+    m_pipeline->videosink = gst_element_factory_make("appsink", NULL);
 
-    if (!pipeline->pipe ||
-        !pipeline->udpsrc ||
-        !pipeline->filter ||
-        !pipeline->rtph264depay ||
-        !pipeline->decodebin ||
-        !pipeline->videoconvert ||
-        !pipeline->convert_filter ||
-        !pipeline->queue ||
-        !pipeline->videosink) {
+    if (!m_pipeline->pipe ||
+        !m_pipeline->udpsrc ||
+        !m_pipeline->filter ||
+        !m_pipeline->rtph264depay ||
+        !m_pipeline->decodebin ||
+        !m_pipeline->videoconvert ||
+        !m_pipeline->convert_filter ||
+        !m_pipeline->queue ||
+        !m_pipeline->videosink) {
         logger.LOG_ERROR("Failed to create all pipeline elements");
 
-        delete pipeline;
+        delete m_pipeline;
         return -1;
     }
 
     //Add elements to the Pipeline
-    gst_bin_add_many(GST_BIN(pipeline->pipe),
-        pipeline->udpsrc,
-        pipeline->filter,
-        pipeline->rtph264depay,
-        pipeline->decodebin,
-        pipeline->videoconvert,
-        pipeline->convert_filter,
-        pipeline->queue,
-        pipeline->videosink, NULL);
+    gst_bin_add_many(GST_BIN(m_pipeline->pipe),
+                     m_pipeline->udpsrc,
+                     m_pipeline->filter,
+                     m_pipeline->rtph264depay,
+                     m_pipeline->decodebin,
+                     m_pipeline->videoconvert,
+                     m_pipeline->convert_filter,
+                     m_pipeline->queue,
+                     m_pipeline->videosink, NULL);
 
     return 0;
 }
@@ -171,23 +171,23 @@ int VideoSub::Configure_Elements()
     GstCaps* convert_caps = gst_caps_new_simple("video/x-raw",
             "format", G_TYPE_STRING, "RGB", NULL);
 
-    g_object_set(G_OBJECT(pipeline->udpsrc), "port", std::stoi(parameters.at("IN_PORT")), NULL);
-    g_object_set(G_OBJECT(pipeline->filter), "caps", caps, NULL);
-    g_object_set(G_OBJECT(pipeline->convert_filter), "caps", convert_caps, NULL);
+    g_object_set(G_OBJECT(m_pipeline->udpsrc), "port", std::stoi(parameters.at("IN_PORT")), NULL);
+    g_object_set(G_OBJECT(m_pipeline->filter), "caps", caps, NULL);
+    g_object_set(G_OBJECT(m_pipeline->convert_filter), "caps", convert_caps, NULL);
     gst_caps_unref(caps);
     gst_caps_unref(convert_caps);
 
 
     //Register Callbacks
-    g_signal_connect(pipeline->decodebin, "pad-added", G_CALLBACK(Pad_Callback), pipeline->videoconvert);
-    GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline->pipe));
+    g_signal_connect(m_pipeline->decodebin, "pad-added", G_CALLBACK(Pad_Callback), m_pipeline->videoconvert);
+    GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(m_pipeline->pipe));
 
     gst_bus_add_signal_watch(bus);
-    g_signal_connect(bus, "message", (GCallback)Bus_Message_Callback, pipeline->pipe);
+    g_signal_connect(bus, "message", (GCallback)Bus_Message_Callback, m_pipeline->pipe);
 
     //g_signal_connect(pipeline->videosink, "pull-sample", (GCallback)Update_Shared_Video_Data, this);
-    g_object_set(G_OBJECT(pipeline->videosink), "emit-signals", TRUE, "sync", FALSE, NULL);
-    g_signal_connect(pipeline->videosink, "new-sample", G_CALLBACK(Update_Shared_Video_Data), this);
+    g_object_set(G_OBJECT(m_pipeline->videosink), "emit-signals", TRUE, "sync", FALSE, NULL);
+    g_signal_connect(m_pipeline->videosink, "new-sample", G_CALLBACK(Update_Shared_Video_Data), this);
 
     return 0;
 }
@@ -196,26 +196,26 @@ int VideoSub::Link_Elements()
 {
     //Link udpsrc through to decode bin
     if (!gst_element_link_many(
-            pipeline->udpsrc,
-            pipeline->filter,
-            pipeline->rtph264depay,
-            pipeline->decodebin, NULL)) {
+            m_pipeline->udpsrc,
+            m_pipeline->filter,
+            m_pipeline->rtph264depay,
+            m_pipeline->decodebin, NULL)) {
         logger.LOG_ERROR("Failed to link first branch of pipeline elements");
 
-        delete pipeline;
+        delete m_pipeline;
         return -1;
     }
 
     //Decode bin and videoconvert are linked by the Pad Callback
     //Link videoconvert through to videosink
     if (!gst_element_link_many(
-            pipeline->videoconvert,
-            pipeline->convert_filter,
-            pipeline->queue,
-            pipeline->videosink, NULL)) {
+            m_pipeline->videoconvert,
+            m_pipeline->convert_filter,
+            m_pipeline->queue,
+            m_pipeline->videosink, NULL)) {
         logger.LOG_ERROR("Failed to link second branch of pipeline elements");
 
-        delete pipeline;
+        delete m_pipeline;
         return -1;
     }
 
@@ -224,26 +224,26 @@ int VideoSub::Link_Elements()
 
 int VideoSub::Destroy_Pipeline()
 {
-    GstStateChangeReturn ret = gst_element_set_state(pipeline->pipe, GST_STATE_NULL);
+    GstStateChangeReturn ret = gst_element_set_state(m_pipeline->pipe, GST_STATE_NULL);
     if (ret == GST_STATE_CHANGE_FAILURE) {
         logger.LOG_ERROR("Failed to destroy the video pipeline");
-        delete pipeline;
+        delete m_pipeline;
         return -1;
     }
 
     logger.LOG_INFO("Subscriber video pipeline destroyed");
-    delete pipeline;
+    delete m_pipeline;
     return 0;
 }
 
 int VideoSub::Set_Pipeline_State_Playing()
 {
     //Set State to playing
-    GstStateChangeReturn ret = gst_element_set_state(pipeline->pipe, GST_STATE_PLAYING);
+    GstStateChangeReturn ret = gst_element_set_state(m_pipeline->pipe, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {
-        logger.LOG_ERROR("Unable to set the pipeline to the playing state");
+        logger.LOG_ERROR("Unable to set the pipeline to the playing m_state");
 
-        delete pipeline;
+        delete m_pipeline;
         return -1;
     }
 

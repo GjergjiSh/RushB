@@ -5,12 +5,12 @@ ZmqPipeline::ZmqPipeline()
     name = "ZmqPipeline";
     logger.Set_Name(name);
 
-    publisher_funcs = {
+    m_publisher_funcs = {
         std::make_pair("USS", &ZmqPipeline::Publish_Uss),
         std::make_pair("SERVOS", &ZmqPipeline::Publish_Servos),
     };
 
-    subscriber_funcs = {
+    m_subscriber_funcs = {
         std::make_pair("USS", &ZmqPipeline::Update_Uss),
         std::make_pair("SERVOS", &ZmqPipeline::Update_Servos),
     };
@@ -25,14 +25,14 @@ int ZmqPipeline::Init()
 int ZmqPipeline::Cycle_Step()
 {
     // Publish all pub topics and their data
-    for (auto topic : publisher_topics) {
-        if ((this->*publisher_funcs.at(topic))(topic) != 0)
+    for (auto topic : m_publisher_topics) {
+        if ((this->*m_publisher_funcs.at(topic))(topic) != 0)
             return -1;
     }
 
     // Read all sub topics and update shared data
-    for (auto topic : subscriber_topics) {
-        if ((this->*subscriber_funcs.at(topic))() != 0)
+    for (auto topic : m_subscriber_topics) {
+        if ((this->*m_subscriber_funcs.at(topic))() != 0)
             return -1;
     }
 
@@ -47,25 +47,25 @@ int ZmqPipeline::Deinit()
 
 int ZmqPipeline::Construct_Sockets()
 {
-    try { // Create the publisher socket
-        publisher = zmq::socket_t(zmq_context, zmq::socket_type::pub);
+    try { // Create the m_publisher socket
+        m_publisher = zmq::socket_t(m_zmq_context, zmq::socket_type::pub);
     } catch (zmq::error_t& e) {
-        logger.LOG_ERROR_DESCRIPTION("Failed to construct the publisher: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to construct the m_publisher: ", e.what());
         return -1;
     }
 
     try { // Create the subscriber sockets and register the pub/sub topics
         for (auto parameter : parameters) {
             if (parameter.first == "SUB_TOPIC") {
-                subscribers.emplace(std::make_pair(parameter.second,
-                    zmq::socket_t(zmq_context, zmq::socket_type::sub)));
-                subscriber_topics.push_back(parameter.second);
+                m_subscribers.emplace(std::make_pair(parameter.second,
+                                                     zmq::socket_t(m_zmq_context, zmq::socket_type::sub)));
+                m_subscriber_topics.push_back(parameter.second);
             } else if (parameter.first == "PUB_TOPIC") {
-                publisher_topics.push_back(parameter.second);
+                m_publisher_topics.push_back(parameter.second);
             }
         }
     } catch (zmq::error_t& e) {
-        logger.LOG_ERROR_DESCRIPTION("Failed to construct the subscribers: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to construct the m_subscribers: ", e.what());
         return -1;
     }
 
@@ -74,22 +74,22 @@ int ZmqPipeline::Construct_Sockets()
 
 int ZmqPipeline::Configure_Sockets()
 {
-    try { // Configure the publisher socket
-        publisher.setsockopt(ZMQ_LINGER, 0);
-        publisher.bind(output_endpoint);
+    try { // Configure the m_publisher socket
+        m_publisher.setsockopt(ZMQ_LINGER, 0);
+        m_publisher.bind(m_output_endpoint);
     } catch (zmq::error_t& e) {
-        logger.LOG_ERROR_DESCRIPTION("Failed to configure the publisher: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to configure the m_publisher: ", e.what());
         return -1;
     }
 
     try { // Configure the subscriber sockets and assing their topics
-        for (auto& [topic, socket] : subscribers) {
+        for (auto& [topic, socket] : m_subscribers) {
             socket.setsockopt(ZMQ_SUBSCRIBE, topic.c_str(), topic.size());
             socket.setsockopt(ZMQ_LINGER, 0);
-            socket.connect(input_endpoint);
+            socket.connect(m_input_endpoint);
         }
     } catch (zmq::error_t& e) {
-        logger.LOG_ERROR_DESCRIPTION("Failed to configure the subscribers: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to configure the m_subscribers: ", e.what());
         return -1;
     }
 
@@ -99,7 +99,7 @@ int ZmqPipeline::Configure_Sockets()
 int ZmqPipeline::Init_Connection()
 {
     try { // Initialize the zmq context
-        zmq_context = zmq::context_t(1);
+        m_zmq_context = zmq::context_t(1);
     } catch (zmq::error_t& e) {
         logger.LOG_ERROR_DESCRIPTION("Failed to initialize the zmq context: ", e.what());
         return -1;
@@ -115,10 +115,10 @@ int ZmqPipeline::Init_Connection()
 int ZmqPipeline::Init_Endpoints()
 {
     try { // Create the zmq endpoint strings
-        input_endpoint.append(parameters.at("REMOTE"));
-        input_endpoint.append(":");
-        input_endpoint.append(parameters.at("IN_PORT"));
-        output_endpoint.append(parameters.at("OUT_PORT"));
+        m_input_endpoint.append(parameters.at("REMOTE"));
+        m_input_endpoint.append(":");
+        m_input_endpoint.append(parameters.at("IN_PORT"));
+        m_output_endpoint.append(parameters.at("OUT_PORT"));
     } catch (std::exception& e) {
         logger.LOG_ERROR_DESCRIPTION("Failed to initialize the endpoints", e.what());
         return -1;
@@ -129,24 +129,24 @@ int ZmqPipeline::Init_Endpoints()
 
 int ZmqPipeline::Deinit_Connection()
 {
-    try { // Close the publisher socket
-        publisher.close();
+    try { // Close the m_publisher socket
+        m_publisher.close();
     } catch (zmq::error_t& e) {
-        logger.LOG_ERROR_DESCRIPTION("Failed to close the publisher: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to close the m_publisher: ", e.what());
         return -1;
     }
 
     try { // Close the subscriber sockets
-        for (auto& [topic, socket] : subscribers) {
+        for (auto& [topic, socket] : m_subscribers) {
             socket.close();
         }
     } catch (zmq::error_t& e) {
-        logger.LOG_ERROR_DESCRIPTION("Failed to close the subscribers: ", e.what());
+        logger.LOG_ERROR_DESCRIPTION("Failed to close the m_subscribers: ", e.what());
         return -1;
     }
 
     try { // Close the zmq context
-        zmq_context.close();
+        m_zmq_context.close();
     } catch (zmq::error_t& e) {
         logger.LOG_ERROR_DESCRIPTION("Failed to close the zmq context: ", e.what());
         return -1;
@@ -167,8 +167,8 @@ int ZmqPipeline::Send(const std::string& topic, std::string& data)
         memcpy(zmq_message.data(), data.data(), data.length());
 
         // Send message and topic
-        publisher.send(zmq_topic, zmq::send_flags::sndmore);
-        publisher.send(zmq_message, zmq::send_flags::dontwait);
+        m_publisher.send(zmq_topic, zmq::send_flags::sndmore);
+        m_publisher.send(zmq_message, zmq::send_flags::dontwait);
 
         // Rebuild message and topic from parameter size
         zmq_topic.rebuild(topic.size());
@@ -187,14 +187,14 @@ int ZmqPipeline::Recv(const std::string& topic, std::string& data)
     zmq::message_t zmq_topic;
     zmq::message_t zmq_msg;
 
-    zmq::pollitem_t poll_item = { subscribers.at(topic), 0, ZMQ_POLLIN, 0 };
+    zmq::pollitem_t poll_item = {m_subscribers.at(topic), 0, ZMQ_POLLIN, 0 };
     try {
         zmq::poll(&poll_item, 1, 0);
 
         if (poll_item.revents & ZMQ_POLLIN) {
 
-            recv = subscribers.at(topic).recv(&zmq_topic, ZMQ_RCVMORE);
-            recv = subscribers.at(topic).recv(&zmq_msg) && recv;
+            recv = m_subscribers.at(topic).recv(&zmq_topic, ZMQ_RCVMORE);
+            recv = m_subscribers.at(topic).recv(&zmq_msg) && recv;
 
             data.assign(static_cast<char*>(zmq_msg.data()), zmq_msg.size());
 

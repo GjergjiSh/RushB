@@ -48,5 +48,5 @@ private:
     int Set_Pipeline_State_Playing();
     void Start_Gloop();
 
-    VideoPipeline_t* pipeline;
+    VideoPipeline_t* m_pipeline;
 };

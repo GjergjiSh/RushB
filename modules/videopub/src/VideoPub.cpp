@@ -28,7 +28,7 @@ int VideoPub::Deinit()
 
 int VideoPub::Construct_Pipeline()
 {
-    this->pipeline = std::make_shared<VideoPipeline_t>();
+    this->m_pipeline = std::make_shared<VideoPipeline_t>();
 
     gst_init(NULL, NULL);
     if (Create_Elements() != 0) return -1;
@@ -41,42 +41,42 @@ int VideoPub::Construct_Pipeline()
 
 int VideoPub::Create_Elements()
 {
-    this->pipeline->pipe = gst_pipeline_new("Publisher Video Pipeline");
-    this->pipeline->v4l2src = gst_element_factory_make("v4l2src", NULL);
-    this->pipeline->videoconvert = gst_element_factory_make("videoconvert", NULL);
-    this->pipeline->x264enc = gst_element_factory_make("x264enc", NULL);
-    this->pipeline->rtph264pay = gst_element_factory_make("rtph264pay", NULL);
-    this->pipeline->udpsink = gst_element_factory_make("udpsink", NULL);
+    this->m_pipeline->pipe = gst_pipeline_new("Publisher Video Pipeline");
+    this->m_pipeline->v4l2src = gst_element_factory_make("v4l2src", NULL);
+    this->m_pipeline->videoconvert = gst_element_factory_make("videoconvert", NULL);
+    this->m_pipeline->x264enc = gst_element_factory_make("x264enc", NULL);
+    this->m_pipeline->rtph264pay = gst_element_factory_make("rtph264pay", NULL);
+    this->m_pipeline->udpsink = gst_element_factory_make("udpsink", NULL);
 
-    if (!pipeline->pipe ||
-        !this->pipeline->v4l2src ||
-        !this->pipeline->videoconvert ||
-        !this->pipeline->x264enc ||
-        !this->pipeline->rtph264pay ||
-        !this->pipeline->udpsink) {
+    if (!m_pipeline->pipe ||
+        !this->m_pipeline->v4l2src ||
+        !this->m_pipeline->videoconvert ||
+        !this->m_pipeline->x264enc ||
+        !this->m_pipeline->rtph264pay ||
+        !this->m_pipeline->udpsink) {
 
         logger.LOG_ERROR("Elements could not be created");
         return -1;
     }
 
-    gst_bin_add_many(GST_BIN(pipeline->pipe),
-        this->pipeline->v4l2src,
-        this->pipeline->videoconvert,
-        this->pipeline->x264enc,
-        this->pipeline->rtph264pay,
-        this->pipeline->udpsink, NULL);
+    gst_bin_add_many(GST_BIN(m_pipeline->pipe),
+                     this->m_pipeline->v4l2src,
+                     this->m_pipeline->videoconvert,
+                     this->m_pipeline->x264enc,
+                     this->m_pipeline->rtph264pay,
+                     this->m_pipeline->udpsink, NULL);
 
     return 0;
 }
 
 int VideoPub::Configure_Elements()
 {
-    g_object_set(pipeline->v4l2src, "device", parameters.at("CAMERA_INDEX").c_str(), NULL);
-    g_object_set(pipeline->x264enc, "tune", 4, NULL);
-    g_object_set(pipeline->x264enc, "speed-preset", 1, NULL);
-    g_object_set(pipeline->x264enc, "bitrate", std::stoi(parameters.at("BITRATE")), NULL);
-    g_object_set(G_OBJECT(pipeline->udpsink), "host", parameters.at("REMOTE_HOST").c_str(), NULL);
-    g_object_set(G_OBJECT(pipeline->udpsink), "port", std::stoi(parameters.at("OUT_PORT")), NULL);
+    g_object_set(m_pipeline->v4l2src, "device", parameters.at("CAMERA_INDEX").c_str(), NULL);
+    g_object_set(m_pipeline->x264enc, "tune", 4, NULL);
+    g_object_set(m_pipeline->x264enc, "speed-preset", 1, NULL);
+    g_object_set(m_pipeline->x264enc, "bitrate", std::stoi(parameters.at("BITRATE")), NULL);
+    g_object_set(G_OBJECT(m_pipeline->udpsink), "host", parameters.at("REMOTE_HOST").c_str(), NULL);
+    g_object_set(G_OBJECT(m_pipeline->udpsink), "port", std::stoi(parameters.at("OUT_PORT")), NULL);
 
     return 0;
 }
@@ -84,13 +84,13 @@ int VideoPub::Configure_Elements()
 int VideoPub::Link_Elements()
 {
     if (!gst_element_link_many(
-        pipeline->v4l2src,
-        pipeline->videoconvert,
-        pipeline->x264enc,
-        pipeline->rtph264pay,
-        pipeline->udpsink, NULL)) {
+            m_pipeline->v4l2src,
+            m_pipeline->videoconvert,
+            m_pipeline->x264enc,
+            m_pipeline->rtph264pay,
+            m_pipeline->udpsink, NULL)) {
         logger.LOG_ERROR("Elements could not be linked");
-        gst_object_unref(pipeline->pipe);
+        gst_object_unref(m_pipeline->pipe);
         return -1;
     }
     return 0;
@@ -98,8 +98,8 @@ int VideoPub::Link_Elements()
 
 int VideoPub::Destroy_Pipeline()
 {
-    gst_element_set_state(this->pipeline->pipe, GST_STATE_NULL);
-    gst_object_unref(GST_OBJECT(this->pipeline->pipe));
+    gst_element_set_state(this->m_pipeline->pipe, GST_STATE_NULL);
+    gst_object_unref(GST_OBJECT(this->m_pipeline->pipe));
 
     logger.LOG_INFO("Video pipeline destroyed");
     return 0;
@@ -107,10 +107,10 @@ int VideoPub::Destroy_Pipeline()
 
 int VideoPub::Set_Pipeline_State_Playing()
 {
-    GstStateChangeReturn ret = gst_element_set_state(pipeline->pipe, GST_STATE_PLAYING);
+    GstStateChangeReturn ret = gst_element_set_state(m_pipeline->pipe, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {
-        logger.LOG_ERROR("Unable to set the pipeline to the playing state");
-        gst_object_unref(pipeline->pipe);
+        logger.LOG_ERROR("Unable to set the pipeline to the playing m_state");
+        gst_object_unref(m_pipeline->pipe);
         return -1;
     } else {
         logger.LOG_INFO("Video pipeline set to playing");

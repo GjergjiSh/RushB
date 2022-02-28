@@ -35,7 +35,7 @@ std::vector<DetectionUtils::tBoundingBox> ObjectDetector::Detect(cv::Mat& src, b
     auto time_preprocess0 = std::chrono::steady_clock::now();
     std::vector<DetectionUtils::tBoundingBox> detections;
     tensorflow::Tensor input = Convert_Mat_To_Tensor(src);
-    std::vector<std::pair<std::string, tensorflow::Tensor>> graph_input = { { graph_input_node, input } };
+    std::vector<std::pair<std::string, tensorflow::Tensor>> graph_input = { {m_graph_input_node, input } };
     std::vector<tensorflow::Tensor> graph_output;
     int height = src.rows;
     int width = src.cols;
@@ -43,7 +43,7 @@ std::vector<DetectionUtils::tBoundingBox> ObjectDetector::Detect(cv::Mat& src, b
 
     //Run Inference
     auto time_inference0 = std::chrono::steady_clock::now();
-    this->saved_model.GetSession()->Run(graph_input, graph_output_nodes, {}, &graph_output);
+    this->m_saved_model.GetSession()->Run(graph_input, m_graph_output_nodes, {}, &graph_output);
     auto time_inference1 = std::chrono::steady_clock::now();
 
 
@@ -61,7 +61,7 @@ std::vector<DetectionUtils::tBoundingBox> ObjectDetector::Detect(cv::Mat& src, b
         DetectionUtils::tBoundingBox bounding_box;
 
         bounding_box.confidence = predicted_confidences(0, i);
-        if (bounding_box.confidence > confidence_threshold) {
+        if (bounding_box.confidence > m_confidence_threshold) {
 
             bounding_box.roi.y = (int)(predicted_boxes(0, i, 0) * height);
             bounding_box.roi.x = (int)(predicted_boxes(0, i, 1) * width);
@@ -82,14 +82,14 @@ std::vector<DetectionUtils::tBoundingBox> ObjectDetector::Detect(cv::Mat& src, b
     auto time_post_process1 = std::chrono::steady_clock::now();
 
     // Calculate inference time results for the last frame: pre,during and post processing
-    this->inference_time_result.time_post_process = (time_post_process1 - time_post_process0).count() / 1000000.0;
-    this->inference_time_result.time_inference = (time_inference1 - time_inference0).count() / 1000000.0;
-    this->inference_time_result.time_pre_process = (time_preprocess1 - time_preprocess0).count() / 1000000.0;
+    this->m_inference_time_result.time_post_process = (time_post_process1 - time_post_process0).count() / 1000000.0;
+    this->m_inference_time_result.time_inference = (time_inference1 - time_inference0).count() / 1000000.0;
+    this->m_inference_time_result.time_pre_process = (time_preprocess1 - time_preprocess0).count() / 1000000.0;
 
-    if (time_log) {
-        logger.LOG_TIME_INFO("Pre-process time", inference_time_result.time_pre_process);
-        logger.LOG_TIME_INFO("Inference time", inference_time_result.time_inference);
-        logger.LOG_TIME_INFO("Post-process time", inference_time_result.time_post_process);
+    if (m_time_log) {
+        logger.LOG_TIME_INFO("Pre-process time", m_inference_time_result.time_pre_process);
+        logger.LOG_TIME_INFO("Inference time", m_inference_time_result.time_inference);
+        logger.LOG_TIME_INFO("Post-process time", m_inference_time_result.time_post_process);
     }
 
     return detections;
@@ -97,14 +97,14 @@ std::vector<DetectionUtils::tBoundingBox> ObjectDetector::Detect(cv::Mat& src, b
 
 int ObjectDetector::Load_Labels()
 {
-    std::ifstream labels_file(this->label_path);
+    std::ifstream labels_file(this->m_label_path);
     std::string label;
 
     if (labels_file) {
         while (getline(labels_file, label)) {
             this->labels.emplace_back(label);
         }
-        logger.LOG_INFO(std::string("Loaded labels from: ").append(this->label_path));
+        logger.LOG_INFO(std::string("Loaded labels from: ").append(this->m_label_path));
     } else {
         logger.LOG_ERROR("Failed to load labels");
         return -1;
@@ -114,15 +114,15 @@ int ObjectDetector::Load_Labels()
 
 int ObjectDetector::Init_Model()
 {
-    session_options.config.mutable_gpu_options()->set_allow_growth(true);
+    m_session_options.config.mutable_gpu_options()->set_allow_growth(true);
 
     // Parse saved model directory and create the neural network
     tensorflow::Status status = tensorflow::LoadSavedModel(
-                                this->session_options,
-                                this->run_options,
-                                this->model_path,
+                                this->m_session_options,
+                                this->m_run_options,
+                                this->m_model_path,
                                 { "serve" },
-                                &this->saved_model);
+                                &this->m_saved_model);
 
     // Make sure the GPU is visible
     setenv("CUDA_VISIBLE_DEVICES", "0,1", -1);
@@ -134,7 +134,7 @@ int ObjectDetector::Init_Model()
 
     // Print Device Info
     std::vector<tensorflow::DeviceAttributes> response;
-    saved_model.GetSession()->ListDevices(&response);
+    m_saved_model.GetSession()->ListDevices(&response);
 
     for (int index = 0; index < response.size(); ++index) {
         auto value = response[index];
@@ -157,10 +157,10 @@ void ObjectDetector::Warmup()
 
 int ObjectDetector::Init_Detector()
 {
-    model_path = parameters.at("MODEL_PATH").c_str();
-    label_path = parameters.at("LABEL_PATH").c_str();
-    confidence_threshold = std::stof(parameters.at("CONFIDENCE_THRESHOLD"));
-    time_log = std::stof(parameters.at("TIME_LOG"));
+    m_model_path = parameters.at("MODEL_PATH").c_str();
+    m_label_path = parameters.at("LABEL_PATH").c_str();
+    m_confidence_threshold = std::stof(parameters.at("CONFIDENCE_THRESHOLD"));
+    m_time_log = std::stof(parameters.at("TIME_LOG"));
 
     if (Init_Model() != 0) return -1;
     if (Load_Labels() != 0) return -1;

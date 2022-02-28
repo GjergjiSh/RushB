@@ -51,17 +51,16 @@ public:
 
     int Process_Input();
     int Initialize_Device();
-    void Print_Driver_Wish();
 
 private:
     void Handle_Button_Events();
     void Handle_Thumbstick_Events();
     bool Connected();
 
-    const char* device_path;
-    int file_descriptor;
-    state_t state;
-    js_event event;
+    const char* m_device_path;
+    int m_file_descriptor;
+    state_t m_state;
+    js_event m_event;
 
 
 };

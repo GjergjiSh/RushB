@@ -4,37 +4,37 @@
 void RBLogger::Logger::LOG_INFO(std::string msg)
 {
     std::stringstream msg_stream;
-    msg_stream << name << TAG_END << " " << msg;
+    msg_stream << m_name << TAG_END << " " << msg;
     PRINT(RBLogger::INFO);
 }
 void RBLogger::Logger::LOG_TIME_INFO(std::string msg, int time)
 {
     std::stringstream msg_stream;
-    msg_stream << name << TAG_END << " " << msg << time << " [ms]";
+    msg_stream << m_name << TAG_END << " " << msg << time << " [ms]";
     PRINT(RBLogger::INFO);
 }
 void RBLogger::Logger::LOG_WARNING(std::string msg)
 {
     std::stringstream msg_stream;
-    msg_stream << name << TAG_END << " " << msg;
+    msg_stream << m_name << TAG_END << " " << msg;
     PRINT(RBLogger::WARNING);
 }
 void RBLogger::Logger::LOG_ERROR_DESCRIPTION(std::string msg, std::string err)
 {
     std::stringstream msg_stream;
-    msg_stream << name << TAG_END << " " << msg << " " << err;
+    msg_stream << m_name << TAG_END << " " << msg << " " << err;
     PRINT(RBLogger::ERROR);
 }
 void RBLogger::Logger::LOG_ERROR(std::string msg)
 {
     std::stringstream msg_stream;
-    msg_stream << name << TAG_END << " " << msg;
+    msg_stream << m_name << TAG_END << " " << msg;
     PRINT(RBLogger::ERROR);
 }
 
 void RBLogger::Logger::Set_Name(std::string name)
 {
-    this->name = name;
+    this->m_name = name;
 }
 
 std::string RBLogger::Logger::Time_Stamp()

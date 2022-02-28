@@ -32,16 +32,16 @@ private:
     int Update_Servos();
     int Update_Uss();
 
-    zmq::context_t zmq_context;
-    zmq::socket_t publisher;
-    std::unordered_map<std::string, zmq::socket_t> subscribers;
+    zmq::context_t m_zmq_context;
+    zmq::socket_t m_publisher;
+    std::unordered_map<std::string, zmq::socket_t> m_subscribers;
 
-    std::vector<std::string> publisher_topics;
-    std::vector<std::string> subscriber_topics;
+    std::vector<std::string> m_publisher_topics;
+    std::vector<std::string> m_subscriber_topics;
 
-    std::string input_endpoint = "tcp://";
-    std::string output_endpoint = "tcp://0.0.0.0:";
+    std::string m_input_endpoint = "tcp://";
+    std::string m_output_endpoint = "tcp://0.0.0.0:";
 
-    std::unordered_map<std::string, int (ZmqPipeline::*)(std::string&)> publisher_funcs;
-    std::unordered_map<std::string, int (ZmqPipeline::*)()> subscriber_funcs;
+    std::unordered_map<std::string, int (ZmqPipeline::*)(std::string&)> m_publisher_funcs;
+    std::unordered_map<std::string, int (ZmqPipeline::*)()> m_subscriber_funcs;
 };

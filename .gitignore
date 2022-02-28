@@ -16,3 +16,5 @@ workspace.code-workspace
 build
 cnn
 thirdparty
+.idea
+cmake-build-debug

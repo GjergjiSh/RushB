@@ -9,7 +9,5 @@ public:
     int Cycle_Step(void) override;
     int Deinit(void) override;
 
-    Logger logger;
-
 private:
 };

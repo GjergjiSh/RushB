@@ -28,13 +28,13 @@ private:
     int Assign_Module_Parameters(std::shared_ptr<Module> module);
     void Print_Module_Parameters(std::shared_ptr<Module> module);
 
-    const char* modules_cfg;
-    bool verbose;
-    pugi::xml_document modules_xml;
-    std::vector<std::shared_ptr<Module>> registered_modules;
-    SharedData_t shared_data;
-    SignalHandler sig_handler;
-    RBLogger::Logger logger;
+    const char* m_modules_cfg;
+    bool m_verbose;
+    pugi::xml_document m_modules_xml;
+    std::vector<std::shared_ptr<Module>> m_registered_modules;
+    SharedData_t m_shared_data;
+    SignalHandler m_sig_handler;
+    RBLogger::Logger m_logger;
 };
 
 #endif /* MODULEHANDLER_H */
