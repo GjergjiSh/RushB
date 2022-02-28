@@ -17,6 +17,7 @@ int VideoPub::Init()
 
 int VideoPub::Cycle_Step()
 {
+    /* Video Compression and Publishing handled in gstreamer pipeline */
     return 0;
 }
 
