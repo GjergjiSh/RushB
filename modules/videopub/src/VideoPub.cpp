@@ -7,7 +7,7 @@ VideoPub::VideoPub() {
 
 int VideoPub::Init()
 {
-    logger.LOG_INFO("Initializing...");
+    logger.Info("Initializing...");
 
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;
@@ -22,7 +22,7 @@ int VideoPub::Cycle_Step()
 
 int VideoPub::Deinit()
 {
-    logger.LOG_INFO("Deinitializing...");
+    logger.Info("Deinitializing...");
     return Destroy_Pipeline();
 }
 
@@ -35,7 +35,7 @@ int VideoPub::Construct_Pipeline()
     if (Configure_Elements() != 0) return -1;
     if (Link_Elements() != 0) return -1;
 
-    logger.LOG_INFO("Video pipeline successfuly constructed");
+    logger.Info("Video pipeline successfuly constructed");
     return 0;
 }
 
@@ -55,7 +55,7 @@ int VideoPub::Create_Elements()
         !this->m_pipeline->rtph264pay ||
         !this->m_pipeline->udpsink) {
 
-        logger.LOG_ERROR("Elements could not be created");
+        logger.Error("Elements could not be created");
         return -1;
     }
 
@@ -89,7 +89,7 @@ int VideoPub::Link_Elements()
             m_pipeline->x264enc,
             m_pipeline->rtph264pay,
             m_pipeline->udpsink, NULL)) {
-        logger.LOG_ERROR("Elements could not be linked");
+        logger.Error("Elements could not be linked");
         gst_object_unref(m_pipeline->pipe);
         return -1;
     }
@@ -101,7 +101,7 @@ int VideoPub::Destroy_Pipeline()
     gst_element_set_state(this->m_pipeline->pipe, GST_STATE_NULL);
     gst_object_unref(GST_OBJECT(this->m_pipeline->pipe));
 
-    logger.LOG_INFO("Video pipeline destroyed");
+    logger.Info("Video pipeline destroyed");
     return 0;
 }
 
@@ -109,11 +109,11 @@ int VideoPub::Set_Pipeline_State_Playing()
 {
     GstStateChangeReturn ret = gst_element_set_state(m_pipeline->pipe, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {
-        logger.LOG_ERROR("Unable to set the pipeline to the playing m_state");
+        logger.Error("Unable to set the pipeline to the playing m_state");
         gst_object_unref(m_pipeline->pipe);
         return -1;
     } else {
-        logger.LOG_INFO("Video pipeline set to playing");
+        logger.Info("Video pipeline set to playing");
     }
     return 0;
 }

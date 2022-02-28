@@ -7,7 +7,7 @@ ObjectDetector::ObjectDetector() {
 
 int ObjectDetector::Init()
 {
-    logger.LOG_INFO("Initializing...");
+    logger.Info("Initializing...");
     return Init_Detector();
 }
 
@@ -22,7 +22,7 @@ int ObjectDetector::Cycle_Step()
 
 int ObjectDetector::Deinit()
 {
-    logger.LOG_INFO("Deinitializing...");
+    logger.Info("Deinitializing...");
     return 0;
 }
 
@@ -87,9 +87,9 @@ std::vector<DetectionUtils::tBoundingBox> ObjectDetector::Detect(cv::Mat& src, b
     this->m_inference_time_result.time_pre_process = (time_preprocess1 - time_preprocess0).count() / 1000000.0;
 
     if (m_time_log) {
-        logger.LOG_TIME_INFO("Pre-process time", m_inference_time_result.time_pre_process);
-        logger.LOG_TIME_INFO("Inference time", m_inference_time_result.time_inference);
-        logger.LOG_TIME_INFO("Post-process time", m_inference_time_result.time_post_process);
+        logger.Time_Info("Pre-process time", m_inference_time_result.time_pre_process);
+        logger.Time_Info("Inference time", m_inference_time_result.time_inference);
+        logger.Time_Info("Post-process time", m_inference_time_result.time_post_process);
     }
 
     return detections;
@@ -104,9 +104,9 @@ int ObjectDetector::Load_Labels()
         while (getline(labels_file, label)) {
             this->labels.emplace_back(label);
         }
-        logger.LOG_INFO(std::string("Loaded labels from: ").append(this->m_label_path));
+        logger.Info(std::string("Loaded labels from: ").append(this->m_label_path));
     } else {
-        logger.LOG_ERROR("Failed to load labels");
+        logger.Error("Failed to load labels");
         return -1;
     }
     return 0;
@@ -128,7 +128,7 @@ int ObjectDetector::Init_Model()
     setenv("CUDA_VISIBLE_DEVICES", "0,1", -1);
 
     if (!status.ok()) {
-        logger.LOG_ERROR("Failed to load model");
+        logger.Error("Failed to load model");
         return -1;
     }
 
@@ -150,7 +150,7 @@ int ObjectDetector::Init_Model()
 // Feed initial white image to the detector to warm up the neural network
 void ObjectDetector::Warmup()
 {
-    logger.LOG_INFO("Warming up");
+    logger.Info("Warming up");
     cv::Mat warmup_img(640, 480, CV_8UC3, cv::Scalar(255, 255, 255));
     Detect(warmup_img, DRAW);
 }

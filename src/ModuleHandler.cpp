@@ -26,20 +26,22 @@ int ModuleHandler::Init()
     for (auto module : m_registered_modules) {
         try {
             if (module->Init() != 0) {
-                m_logger.LOG_ERROR(std::string("Failed to initialize module: ").append(module->name));
+                m_logger.Error(std::string("Failed to initialize module: ").append(module->name));
                 return -1;
             };
         }catch(std::out_of_range& oor) {
-            m_logger.LOG_ERROR_DESCRIPTION(std::string("Failed to initialize module - Erronous configuration for module: ").append(module->name), oor.what());
+            m_logger.Error_Description(
+                    std::string("Failed to initialize module - Erronous configuration for module: ").append(
+                            module->name), oor.what());
             return -1;
         }
     }
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    m_logger.LOG_TIME_INFO("Initialized modules in ", elapsed.count());
+    m_logger.Time_Info("Initialized modules in ", elapsed.count());
 
 
-    m_logger.LOG_INFO("Initialization finished");
+    m_logger.Info("Initialization finished");
     return 0;
 }
 
@@ -49,9 +51,9 @@ int ModuleHandler::Deinit()
         module->Deinit();
 
         if (dlclose(module->lib_handle) != 0)
-            m_logger.LOG_ERROR_DESCRIPTION("Failed to destroy module :", dlerror());
+            m_logger.Error_Description("Failed to destroy module :", dlerror());
     }
-    m_logger.LOG_INFO("Deinitialization finished");
+    m_logger.Info("Deinitialization finished");
     return 0;
 }
 
@@ -64,23 +66,23 @@ int ModuleHandler::Run()
                 // Print cycle time for each module
                 auto start = std::chrono::system_clock::now();
                 if (module->Cycle_Step() != 0) {
-                    m_logger.LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
+                    m_logger.Error_Description("Cycle Step failed for module: ", module->name);
                     return -1;
                 };
                 auto end = std::chrono::system_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                m_logger.LOG_TIME_INFO(std::string("Cycle target: ").append(module->name), elapsed.count());
+                m_logger.Time_Info(std::string("Cycle target: ").append(module->name), elapsed.count());
             } else {
                 // Trigger cycle without printing time info
                 if (module->Cycle_Step() != 0) {
-                    m_logger.LOG_ERROR_DESCRIPTION("Cycle Step failed for module: ", module->name);
+                    m_logger.Error_Description("Cycle Step failed for module: ", module->name);
                     return -1;
                 };
             }
         }
     }
 
-    m_logger.LOG_INFO("Exiting...");
+    m_logger.Info("Exiting...");
     return 0;
 }
 
@@ -89,8 +91,8 @@ int ModuleHandler::Parse_Configuration()
     // Load XML config file into memory
     pugi::xml_parse_result parse_result = m_modules_xml.load_file(m_modules_cfg);
     if (!parse_result) {
-        m_logger.LOG_ERROR_DESCRIPTION("Failed to parse the modules configuration file",
-                                       parse_result.description());
+        m_logger.Error_Description("Failed to parse the modules configuration file",
+                                   parse_result.description());
         return -1;
     }
     return 0;
@@ -104,7 +106,7 @@ int ModuleHandler::Register_Modules()
         // Load the library
         void* lib_handle = dlopen(entry.path().c_str(), RTLD_LAZY);
         if (!lib_handle) {
-            m_logger.LOG_ERROR_DESCRIPTION("Failed to load library: ", dlerror());
+            m_logger.Error_Description("Failed to load library: ", dlerror());
             return -1;
         }
 
@@ -115,7 +117,7 @@ int ModuleHandler::Register_Modules()
         auto Create_Module = (Create_t*)dlsym(lib_handle, "Create_Instance");
         const char* dlsym_error = dlerror();
         if (dlsym_error) {
-            m_logger.LOG_ERROR_DESCRIPTION("Failed to load symbol create: ", dlsym_error);
+            m_logger.Error_Description("Failed to load symbol create: ", dlsym_error);
             return -1;
         }
 
@@ -127,7 +129,6 @@ int ModuleHandler::Register_Modules()
         // Only register if the module is in the XML config
         pugi::xml_node module_node = m_modules_xml.child("modules").find_child_by_attribute("name", module->name.c_str());
         if (!module_node) {
-            //delete module;
             continue;
         }
 
@@ -140,7 +141,7 @@ int ModuleHandler::Register_Modules()
 
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    m_logger.LOG_TIME_INFO("Finished registering modules in ", elapsed.count());
+    m_logger.Time_Info("Finished registering modules in ", elapsed.count());
     return 0;
 }
 
@@ -166,7 +167,7 @@ void ModuleHandler::Print_Module_Parameters(std::shared_ptr<Module> module)
 {
     for (auto parameter : module->parameters) {
         std::cout << "[" << m_logger.Time_Stamp() << "] "
-                  << "\033[1;36m[I][ModuleHandler]\033[0m "
+                  << "\033[1;32m[I][ModuleHandler]\033[0m "
                   <<  module->name << " -> "
                   << " Parameter: " << parameter.first
                   << " Value: " << parameter.second

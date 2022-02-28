@@ -7,7 +7,7 @@ InoLink::InoLink() {
 
 int InoLink::Init()
 {
-    logger.LOG_INFO("Initializing...");
+    logger.Info("Initializing...");
     return Init_Serial_Port();
 }
 
@@ -18,7 +18,7 @@ int InoLink::Cycle_Step()
 
 int InoLink::Deinit()
 {
-    logger.LOG_INFO("Deinitializing...");
+    logger.Info("Deinitializing...");
     if (Deinit_Serial_Port() != 0) {
         return -1;
         delete m_serial_port;
@@ -38,9 +38,9 @@ int InoLink::Init_Serial_Port()
 
         m_serial_port->SetTimeout(-1);
         m_serial_port->Open();
-        logger.LOG_INFO("Arduino board connected on port: " + port);
+        logger.Info("Arduino board connected on port: " + port);
     } catch (mn::CppLinuxSerial::Exception& ex) {
-        logger.LOG_ERROR_DESCRIPTION("Connection to Arduino failed to initialize." , ex.what());
+        logger.Error_Description("Connection to Arduino failed to initialize.", ex.what());
         return -1;
     }
     return 0;
@@ -50,9 +50,9 @@ int InoLink::Deinit_Serial_Port()
 {
     try {
         m_serial_port->Close();
-        logger.LOG_INFO("Connection to Arduino deinitialized");
+        logger.Info("Connection to Arduino deinitialized");
     } catch (mn::CppLinuxSerial::Exception& ex) {
-        logger.LOG_ERROR_DESCRIPTION("Connection to Arduino failed to deinitialize", ex.what());
+        logger.Error_Description("Connection to Arduino failed to deinitialize", ex.what());
         return -1;
     }
     return 0;
@@ -81,7 +81,7 @@ int InoLink::Write_Servo_Vals()
         const std::string output_servo_string =  Convert_Servo_Vals();
         m_serial_port->Write(output_servo_string);
     } catch (mn::CppLinuxSerial::Exception& ex) {
-        logger.LOG_ERROR_DESCRIPTION("Failed to write driver wishes to the robot.", ex.what());
+        logger.Error_Description("Failed to write driver wishes to the robot.", ex.what());
         return -1;
     }
     return 0;

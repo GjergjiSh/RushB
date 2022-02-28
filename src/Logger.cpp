@@ -1,40 +1,48 @@
 #include "Logger.h"
 
+void RBLogger::Logger::Info(std::string msg)
+{
+    std::stringstream msg_stream;
+    LOG_PREFIX << msg;
 
-void RBLogger::Logger::LOG_INFO(std::string msg)
-{
-    std::stringstream msg_stream;
-    msg_stream << m_name << TAG_END << " " << msg;
-    PRINT(RBLogger::INFO);
+    Log(RBLogger::INFO, msg_stream);
 }
-void RBLogger::Logger::LOG_TIME_INFO(std::string msg, int time)
+
+void RBLogger::Logger::Time_Info(std::string msg, int time)
 {
     std::stringstream msg_stream;
-    msg_stream << m_name << TAG_END << " " << msg << time << " [ms]";
-    PRINT(RBLogger::INFO);
+    LOG_PREFIX << msg << " " << time << " [ms]";
+
+    Log(RBLogger::INFO, msg_stream);
 }
-void RBLogger::Logger::LOG_WARNING(std::string msg)
+
+void RBLogger::Logger::Warning(std::string msg)
 {
     std::stringstream msg_stream;
-    msg_stream << m_name << TAG_END << " " << msg;
-    PRINT(RBLogger::WARNING);
+    LOG_PREFIX << msg;
+
+    Log(RBLogger::WARNING, msg_stream);
 }
-void RBLogger::Logger::LOG_ERROR_DESCRIPTION(std::string msg, std::string err)
+
+void RBLogger::Logger::Error_Description(std::string msg, std::string err)
 {
     std::stringstream msg_stream;
-    msg_stream << m_name << TAG_END << " " << msg << " " << err;
-    PRINT(RBLogger::ERROR);
+    LOG_PREFIX << msg << " " << err;
+
+    Log(RBLogger::ERROR, msg_stream);
 }
-void RBLogger::Logger::LOG_ERROR(std::string msg)
+
+void RBLogger::Logger::Error(std::string msg)
 {
     std::stringstream msg_stream;
-    msg_stream << m_name << TAG_END << " " << msg;
-    PRINT(RBLogger::ERROR);
+    LOG_PREFIX << msg;
+
+    Log(RBLogger::ERROR, msg_stream);
 }
 
 void RBLogger::Logger::Set_Name(std::string name)
 {
-    this->m_name = name;
+    m_name = name;
 }
 
 std::string RBLogger::Logger::Time_Stamp()
@@ -54,4 +62,10 @@ std::string RBLogger::Logger::Time_Stamp()
               << now_ms.count();
 
     return timestamp.str();
+}
+
+void RBLogger::Logger::Log(std::string tag, std::stringstream& msg)
+{
+    std::cout << "[" << Time_Stamp() << "] "
+              << tag << msg.str() << std::endl;
 }

@@ -27,7 +27,7 @@ int Controller::Cycle_Step()
 
 int Controller::Deinit()
 {
-    logger.LOG_INFO("Deinitializing...");
+    logger.Info("Deinitializing...");
     if (close(m_file_descriptor) != 0)
         return -1;
 
@@ -37,15 +37,15 @@ int Controller::Deinit()
 // Open file descriptor for the controller
 int Controller::Initialize_Device()
 {
-    logger.LOG_INFO("Initializing...");
+    logger.Info("Initializing...");
     char name[256] = "Unknown";
     if ((m_file_descriptor = open(m_device_path, O_RDONLY | O_NONBLOCK)) < 0) {
-        logger.LOG_ERROR_DESCRIPTION(std::string("Cannot open ").append(m_device_path), strerror(errno));
+        logger.Error_Description(std::string("Cannot open ").append(m_device_path), strerror(errno));
         return -1;
     } else {
-        logger.LOG_INFO("Device Recognized");
+        logger.Info("Device Recognized");
         ioctl(m_file_descriptor, JSIOCGNAME(sizeof(name)), name);
-        logger.LOG_INFO(std::string("Device name: ").append(name));
+        logger.Info(std::string("Device name: ").append(name));
     }
     return 0;
 }

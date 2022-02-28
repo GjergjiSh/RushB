@@ -23,7 +23,7 @@ int SignalHandler::Init()
 {
     logger.Set_Name("SignalHandler");
     if (signal((int)SIGINT, SignalHandler::Exit) == SIG_ERR) {
-        logger.LOG_ERROR("Failed to set up signal handler");
+        logger.Error("Failed to set up signal handler");
         return -1;
     }
     return 0;

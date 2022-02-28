@@ -32,7 +32,7 @@ static void Pad_Callback(GstElement* element, GstPad* pad, gpointer data)
     GstElement* video_convert;
 
     name = gst_pad_get_name(pad);
-    //video_sub->logger.LOG_INFO(std::string("A new pad was created"));
+    //video_sub->logger.Info(std::string("A new pad was created"));
 
     caps = gst_pad_get_pad_template_caps(pad);
     description = gst_caps_to_string(caps);
@@ -41,7 +41,7 @@ static void Pad_Callback(GstElement* element, GstPad* pad, gpointer data)
     video_convert = GST_ELEMENT(data);
 
     if (!gst_element_link_pads(element, name, video_convert, "sink")) {
-        //video_sub->logger.LOG_ERROR("Failed to link decodebin and autoconvert");
+        //video_sub->logger.Error("Failed to link decodebin and autoconvert");
     }
 
     g_free(name);
@@ -56,16 +56,16 @@ static GstFlowReturn Update_Shared_Video_Data(GstElement* sink, VideoSub* video_
     if (sample) {
         GstBuffer* buffer = gst_sample_get_buffer(sample);
         if (!buffer) {
-            video_sub->logger.LOG_ERROR("gst_sample_get_buffer() returned NULL");
+            video_sub->logger.Error("gst_sample_get_buffer() returned NULL");
             return GST_FLOW_ERROR;
         }
         GstMapInfo map;
         if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-            video_sub->logger.LOG_ERROR("gst_buffer_map() failed");
+            video_sub->logger.Error("gst_buffer_map() failed");
             return GST_FLOW_ERROR;
         }
         if (!map.data) {
-            video_sub->logger.LOG_ERROR("gst_buffer had NULL data pointer");
+            video_sub->logger.Error("gst_buffer had NULL data pointer");
             return GST_FLOW_ERROR;
         }
 
@@ -86,7 +86,7 @@ VideoSub::VideoSub() {
 
 int VideoSub::Init()
 {
-    logger.LOG_INFO("Video Sub Initializing...");
+    logger.Info("Video Sub Initializing...");
 
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;
@@ -101,7 +101,7 @@ int VideoSub::Cycle_Step()
 
 int VideoSub::Deinit()
 {
-    logger.LOG_INFO("Deinitializing...");
+    logger.Info("Deinitializing...");
     return Destroy_Pipeline();
 }
 
@@ -115,7 +115,7 @@ int VideoSub::Construct_Pipeline()
     if (Configure_Elements() != 0) return -1;
     if (Link_Elements() != 0) return -1;
 
-    logger.LOG_INFO("Video Pipeline successfully constructed");
+    logger.Info("Video Pipeline successfully constructed");
     return 0;
 }
 
@@ -140,7 +140,7 @@ int VideoSub::Create_Elements()
         !m_pipeline->convert_filter ||
         !m_pipeline->queue ||
         !m_pipeline->videosink) {
-        logger.LOG_ERROR("Failed to create all pipeline elements");
+        logger.Error("Failed to create all pipeline elements");
 
         delete m_pipeline;
         return -1;
@@ -200,7 +200,7 @@ int VideoSub::Link_Elements()
             m_pipeline->filter,
             m_pipeline->rtph264depay,
             m_pipeline->decodebin, NULL)) {
-        logger.LOG_ERROR("Failed to link first branch of pipeline elements");
+        logger.Error("Failed to link first branch of pipeline elements");
 
         delete m_pipeline;
         return -1;
@@ -213,7 +213,7 @@ int VideoSub::Link_Elements()
             m_pipeline->convert_filter,
             m_pipeline->queue,
             m_pipeline->videosink, NULL)) {
-        logger.LOG_ERROR("Failed to link second branch of pipeline elements");
+        logger.Error("Failed to link second branch of pipeline elements");
 
         delete m_pipeline;
         return -1;
@@ -226,12 +226,12 @@ int VideoSub::Destroy_Pipeline()
 {
     GstStateChangeReturn ret = gst_element_set_state(m_pipeline->pipe, GST_STATE_NULL);
     if (ret == GST_STATE_CHANGE_FAILURE) {
-        logger.LOG_ERROR("Failed to destroy the video pipeline");
+        logger.Error("Failed to destroy the video pipeline");
         delete m_pipeline;
         return -1;
     }
 
-    logger.LOG_INFO("Subscriber video pipeline destroyed");
+    logger.Info("Subscriber video pipeline destroyed");
     delete m_pipeline;
     return 0;
 }
@@ -241,13 +241,13 @@ int VideoSub::Set_Pipeline_State_Playing()
     //Set State to playing
     GstStateChangeReturn ret = gst_element_set_state(m_pipeline->pipe, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {
-        logger.LOG_ERROR("Unable to set the pipeline to the playing m_state");
+        logger.Error("Unable to set the pipeline to the playing m_state");
 
         delete m_pipeline;
         return -1;
     }
 
-    logger.LOG_INFO("Video pipeline set to playing");
+    logger.Info("Video pipeline set to playing");
     return 0;
 }
 

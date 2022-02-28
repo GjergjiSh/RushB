@@ -9,7 +9,7 @@ VideoPlayer::VideoPlayer()
 
 int VideoPlayer::Init()
 {
-    logger.LOG_INFO("Initializing...");
+    logger.Info("Initializing...");
     cv::namedWindow("Video Viewer");
 
     return 0;
@@ -29,7 +29,7 @@ int VideoPlayer::Cycle_Step()
 
 int VideoPlayer::Deinit()
 {
-    logger.LOG_INFO("Deinitializing...");
+    logger.Info("Deinitializing...");
     cv::destroyAllWindows();
     return 0;
 }
