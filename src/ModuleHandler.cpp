@@ -1,5 +1,4 @@
 #include "ModuleHandler.h"
-#include  <chrono>
 
 ModuleHandler::ModuleHandler(const char* modules_cfg, bool verbose)
     : m_modules_cfg(modules_cfg), m_verbose(verbose)
@@ -29,10 +28,9 @@ int ModuleHandler::Init()
                 m_logger.Error(std::string("Failed to initialize module: ").append(module->name));
                 return -1;
             };
-        }catch(std::out_of_range& oor) {
+        } catch (std::out_of_range& oor) {
             m_logger.Error_Description(
-                    std::string("Failed to initialize module - Erronous configuration for module: ").append(
-                            module->name), oor.what());
+                std::string("Failed to initialize module - Erronous configuration for module: ").append(module->name), oor.what());
             return -1;
         }
     }
@@ -57,6 +55,8 @@ int ModuleHandler::Deinit()
     return 0;
 }
 
+#include <unistd.h>
+
 // Trigger cycle for each registered module
 int ModuleHandler::Run()
 {
@@ -80,6 +80,7 @@ int ModuleHandler::Run()
                 };
             }
         }
+        //usleep(100000);
     }
 
     m_logger.Info("Exiting...");
@@ -113,7 +114,7 @@ int ModuleHandler::Register_Modules()
         // reset errors
         dlerror();
 
-        // load the Create Symbol of the Module
+        // load the factory method of the Module
         auto Create_Module = (Create_t*)dlsym(lib_handle, "Create_Instance");
         const char* dlsym_error = dlerror();
         if (dlsym_error) {
@@ -153,9 +154,9 @@ int ModuleHandler::Assign_Module_Parameters(std::shared_ptr<Module> module)
 
     // Assign the parameter names and values to the module
     for (pugi::xml_node parameter : parameters_node.children()) {
-                auto name = parameter.attribute("name").value();
-                auto val = parameter.attribute("value").value();
-                module->parameters.insert(std::make_pair(name,val));
+        auto name = parameter.attribute("name").value();
+        auto val = parameter.attribute("value").value();
+        module->parameters.insert(std::make_pair(name, val));
     }
 
     // Print the assigned configuration
