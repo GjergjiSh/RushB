@@ -7,11 +7,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -O2 -std=c++17 -Wno-deprecated-decla
 
 add_subdirectory(modules)
 
-option(BUILD_EXAMPLES "Building Example Modules" ON)
-if(BUILD_EXAMPLES)
-    add_subdirectory(example-modules)
-endif()
-
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
     ${CMAKE_CURRENT_BINARY_DIR}/avail_modules
     ${CMAKE_CURRENT_BINARY_DIR}/example-modules
