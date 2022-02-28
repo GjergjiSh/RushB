@@ -251,5 +251,8 @@ int VideoSub::Set_Pipeline_State_Playing()
     return 0;
 }
 
-extern "C" Module* Create() { return new VideoSub;}
-extern "C" void Destroy(Module* module) {delete module;}
+// Factory Method
+extern "C" std::shared_ptr<Module> Create_Instance()
+{
+    return std::make_shared<VideoSub>();
+}

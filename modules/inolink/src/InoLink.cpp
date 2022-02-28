@@ -87,5 +87,8 @@ int InoLink::Write_Servo_Vals()
     return 0;
 }
 
-extern "C" Module* Create() { return new InoLink;}
-extern "C" void Destroy(Module* module) {delete module;}
+// Factory Method
+extern "C" std::shared_ptr<Module> Create_Instance()
+{
+    return std::make_shared<InoLink>();
+}

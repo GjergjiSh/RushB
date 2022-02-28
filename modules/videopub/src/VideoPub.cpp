@@ -119,5 +119,8 @@ int VideoPub::Set_Pipeline_State_Playing()
 }
 
 
-extern "C" Module* Create() { return new VideoPub;}
-extern "C" void Destroy(Module* module) {delete module;}
+// Factory Method
+extern "C" std::shared_ptr<Module> Create_Instance()
+{
+    return std::make_shared<VideoPub>();
+}

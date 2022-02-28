@@ -25,13 +25,13 @@ public:
 private:
     int Parse_Configuration();
     int Register_Modules();
-    int Assign_Module_Parameters(Module* module);
-    void Print_Module_Parameters(Module* module);
+    int Assign_Module_Parameters(std::shared_ptr<Module> module);
+    void Print_Module_Parameters(std::shared_ptr<Module> module);
 
     const char* modules_cfg;
     bool verbose;
     pugi::xml_document modules_xml;
-    std::vector<Module*> registered_modules;
+    std::vector<std::shared_ptr<Module>> registered_modules;
     SharedData_t shared_data;
     SignalHandler sig_handler;
     RBLogger::Logger logger;

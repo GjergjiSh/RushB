@@ -48,14 +48,6 @@ int ModuleHandler::Deinit()
     for (auto module : registered_modules) {
         module->Deinit();
 
-        Destroy_t* Destroy_Module = (Destroy_t*)dlsym(module->lib_handle, "Destroy");
-        const char* dlsym_error = dlerror();
-        if (dlsym_error)
-            logger.LOG_ERROR_DESCRIPTION("Failed to load symbol destroy: ", dlsym_error);
-
-        // Delete the module
-        Destroy_Module(module);
-
         if (dlclose(module->lib_handle) != 0)
             logger.LOG_ERROR_DESCRIPTION("Failed to destroy module :", dlerror());
     }
@@ -120,7 +112,8 @@ int ModuleHandler::Register_Modules()
         dlerror();
 
         // load the Create Symbol of the Module
-        Create_t* Create_Module = (Create_t*)dlsym(lib_handle, "Create");
+        //Create_t* Create_Module = (Create_t*)dlsym(lib_handle, "Create");
+        auto Create_Module = (Create_t*)dlsym(lib_handle, "Create_Instance");
         const char* dlsym_error = dlerror();
         if (dlsym_error) {
             logger.LOG_ERROR_DESCRIPTION("Failed to load symbol create: ", dlsym_error);
@@ -128,14 +121,14 @@ int ModuleHandler::Register_Modules()
         }
 
         // Create the Module Instance
-        Module* module = Create_Module();
+        std::shared_ptr<Module> module = Create_Module();
         module->lib_handle = lib_handle;
         module->shared_data = &shared_data;
 
         // Only register if the module is in the XML config
         pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name.c_str());
         if (!module_node) {
-            delete module;
+            //delete module;
             continue;
         }
 
@@ -152,7 +145,7 @@ int ModuleHandler::Register_Modules()
     return 0;
 }
 
-int ModuleHandler::Assign_Module_Parameters(Module* module)
+int ModuleHandler::Assign_Module_Parameters(std::shared_ptr<Module> module)
 {
     // Find the module's node in the XML config file
     pugi::xml_node module_node = modules_xml.child("modules").find_child_by_attribute("name", module->name.c_str());
@@ -170,7 +163,7 @@ int ModuleHandler::Assign_Module_Parameters(Module* module)
     return 0;
 }
 
-void ModuleHandler::Print_Module_Parameters(Module* module)
+void ModuleHandler::Print_Module_Parameters(std::shared_ptr<Module> module)
 {
     for (auto parameter : module->parameters) {
         std::cout << "[" << logger.Time_Stamp() << "] "

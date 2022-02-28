@@ -2,6 +2,7 @@
 #define MODULE_H
 
 #include "Logger.h"
+#include <memory>
 
 #include <iostream>
 #include <unordered_map>
@@ -50,15 +51,14 @@ public:
 
     std::string name;
     std::unordered_map<std::string, std::string> parameters;
-    void* lib_handle;
     SharedData_t* shared_data;
+    void* lib_handle;
 
     RBLogger::Logger logger;
 
 };
 
 // Factory Methods
-typedef Module* Create_t();
-typedef void Destroy_t(Module*);
+typedef std::shared_ptr<Module> Create_t();
 
 #endif /* MODULE_H */
