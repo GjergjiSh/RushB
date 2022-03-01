@@ -24,9 +24,8 @@ pugi::xml_node ParameterManager::Get_Module_Node(std::shared_ptr<Module> module)
                                               .find_child_by_attribute(
                                               "name",module->name.c_str());
 
-    if (!module_node) {
+    if (!module_node)
         m_logger.Warning("Module not found");
-    }
 
     return module_node;
 }
@@ -36,11 +35,9 @@ int ParameterManager::Assign_Module_Parameters(std::shared_ptr<Module> module)
 {
     // Find the module's node in the XML config file
     pugi::xml_node module_node = Get_Module_Node(module);
-
     if (!module_node) return -1;
 
     pugi::xml_node parameters_node = module_node.child("parameters");
-
     if (!parameters_node) return -1;
 
     // Assign the parameter names and values to the module
