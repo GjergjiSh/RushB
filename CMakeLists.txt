@@ -14,7 +14,7 @@ set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
 
 add_executable(ControlCenter .
     src/Main.cpp
-    src/ModuleHandler.cpp
+        src/ModuleManager.cpp
     src/SignalHandler.cpp
     src/Logger.cpp
     src/ParameterManager.cpp

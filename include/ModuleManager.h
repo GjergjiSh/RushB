@@ -16,10 +16,10 @@
 #include "SignalHandler.h"
 #include "ParameterManager.h"
 
-class ModuleHandler {
+class ModuleManager {
 public:
-    ModuleHandler(const char* modules_cfg, bool verbose);
-    ~ModuleHandler() = default;
+    ModuleManager(const char* modules_cfg, bool verbose);
+    ~ModuleManager() = default;
     int Init();
     int Run();
     int Deinit();

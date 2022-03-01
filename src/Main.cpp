@@ -1,9 +1,9 @@
-#include "ModuleHandler.h"
+#include "ModuleManager.h"
 #include <iostream>
 
 int main(int argc, char* argv[])
 {
-    ModuleHandler module_handler("ModuleConfig.xml", NO_VERB);
+    ModuleManager module_handler("ModuleConfig.xml", NO_VERB);
 
     if (module_handler.Init() == 0) {
         module_handler.Run();

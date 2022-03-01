@@ -1,13 +1,13 @@
-#include "ModuleHandler.h"
+#include "ModuleManager.h"
 
-ModuleHandler::ModuleHandler(const char* modules_cfg, bool verbose)
+ModuleManager::ModuleManager(const char* modules_cfg, bool verbose)
     : m_verbose(verbose)
     {
-        m_logger.Set_Name("ModuleHandler");
+        m_logger.Set_Name("ModuleManager");
         m_parameter_manager = std::make_unique<ParameterManager>(modules_cfg);
     }
 
-int ModuleHandler::Init()
+int ModuleManager::Init()
 {
     // Init values of shared data members to 0
     memset(&m_shared_data, 0, sizeof(m_shared_data));
@@ -44,7 +44,7 @@ int ModuleHandler::Init()
     return 0;
 }
 
-int ModuleHandler::Deinit()
+int ModuleManager::Deinit()
 {
     for (auto module : m_registered_modules) {
         module->Deinit();
@@ -57,7 +57,7 @@ int ModuleHandler::Deinit()
 }
 
 // Trigger cycle for each registered module
-int ModuleHandler::Run()
+int ModuleManager::Run()
 {
     while (!m_sig_handler.Received_Exit_Sig()) {
         for (auto module : m_registered_modules) {
@@ -86,7 +86,7 @@ int ModuleHandler::Run()
     return 0;
 }
 
-int ModuleHandler::Register_Modules()
+int ModuleManager::Register_Modules()
 {
     auto start = std::chrono::system_clock::now();
     // Iterate the available libraries in the lib folder
