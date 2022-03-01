@@ -15,6 +15,7 @@ public:
     int Parse_Configuration();
     pugi::xml_node Get_Module_Node(std::shared_ptr<Module> module);
     int Assign_Module_Parameters(std::shared_ptr<Module> module);
+    bool Module_Activated(pugi::xml_node module);
 
 private:
     void Print_Module_Parameters(std::shared_ptr<Module> module);

@@ -30,6 +30,15 @@ pugi::xml_node ParameterManager::Get_Module_Node(std::shared_ptr<Module> module)
     return module_node;
 }
 
+// Returns true if the value of the active attribute for a module is set to 1
+bool ParameterManager::Module_Activated(pugi::xml_node module)
+{
+    if (*(module.attribute("active").value()) == '1')
+        return true;
+
+    return false;
+}
+
 // Assign the parameters defined in the XML config to the Module
 int ParameterManager::Assign_Module_Parameters(std::shared_ptr<Module> module)
 {

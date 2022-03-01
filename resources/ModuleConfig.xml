@@ -2,7 +2,7 @@
 
 <modules>
 
-    <module name="Writer">
+    <module name="Writer" active="1">
         <parameters>
             <parameter name="TOP_SERVO" value="90" />
             <parameter name="RIGHT_SERVO" value="100" />
@@ -10,19 +10,19 @@
         </parameters>
     </module>
 
-    <module name="Reader">
+    <module name="Reader" active="1">
         <parameters>
             <parameter name="HELLO" value="Reader says Hello World :)" />
         </parameters>
     </module>
 
-    <module name="Controller">
+    <module name="Controller" active="1">
         <parameters>
             <parameter name="DEVICE_PATH" value="/dev/input/by-id/usb-Inno_GamePad.._Inno_GamePad.._0000001-joystick" />
         </parameters>
     </module>
 
-    <module name="ZmqPipeline">
+    <module name="ZmqPipeline" active="1">
         <parameters>
             <parameter name="REMOTE" value="127.0.0.1" />
             <parameter name="OUT_PORT" value="5001" />
@@ -32,13 +32,13 @@
         </parameters>
     </module>
 
-    <module name="VideoSub">
+    <module name="VideoSub" active="1">
         <parameters>
             <parameter name="IN_PORT" value="5004" />
         </parameters>
     </module>
 
-    <module name="VideoPub">
+    <module name="VideoPub" active="1">
         <parameters>
             <parameter name="CAMERA_INDEX" value="/dev/video0" />
             <parameter name="BITRATE" value="2000" />
@@ -47,12 +47,12 @@
         </parameters>
     </module>
 
-    <module name="VideoPlayer">
+    <module name="VideoPlayer" active="1">
         <parameters>
         </parameters>
     </module>
 
-    <module name="ObjectDetector">
+    <module name="ObjectDetector" active="1">
         <parameters>
             <parameter name="MODEL_PATH" value="/home/gjshk527/Repos/Steinbeis/adtf/adtf.experiments.video/object-detection/cpp-prototypes/tf-prototype/resources/ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8/saved_model" />
             <parameter name="LABEL_PATH" value="/home/gjshk527/Repos/Steinbeis/adtf/adtf.experiments.video/object-detection/cpp-prototypes/tf-prototype/resources/coco.names" />
@@ -61,7 +61,7 @@
         </parameters>
     </module>
 
-    <module name="InoLink">
+    <module name="InoLink" active="1">
         <parameters>
             <parameter name="SERIAL_PORT" value="/dev/ttyACM0" />
             <parameter name="BAUD_RATE" value="50000" />
