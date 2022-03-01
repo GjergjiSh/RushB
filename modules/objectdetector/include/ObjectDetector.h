@@ -1,4 +1,4 @@
-#include "ModuleInterface.h"
+#include "IModuleInterface.h"
 #include "DetectionUtils.h"
 
 #include "tensorflow/cc/client/client_session.h"

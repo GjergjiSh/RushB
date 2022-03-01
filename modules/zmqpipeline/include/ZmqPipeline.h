@@ -1,6 +1,6 @@
 #include <zmq.hpp>
 
-#include "ModuleInterface.h"
+#include "IModuleInterface.h"
 #include "ProtoModuleInterface.pb.h"
 
 class ZmqPipeline : public Module {

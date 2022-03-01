@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "Logger.h"
-#include "ModuleInterface.h"
+#include "IModuleInterface.h"
 #include "SignalHandler.h"
 #include "ParameterManager.h"
 

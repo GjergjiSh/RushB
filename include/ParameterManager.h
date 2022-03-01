@@ -4,7 +4,7 @@
 #include <pugixml.hpp>
 
 #include "Logger.h"
-#include "ModuleInterface.h"
+#include "IModuleInterface.h"
 
 class ParameterManager {
 

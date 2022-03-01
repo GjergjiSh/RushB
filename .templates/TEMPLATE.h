@@ -1,4 +1,4 @@
-#include "ModuleInterface.h"
+#include "IModuleInterface.h"
 #include "Logger.h"
 
 class TEMPLATE : public Module {

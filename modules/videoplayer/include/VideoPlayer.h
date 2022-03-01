@@ -2,7 +2,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "ModuleInterface.h"
+#include "IModuleInterface.h"
 
 class VideoPlayer : public Module {
 

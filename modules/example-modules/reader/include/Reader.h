@@ -1,4 +1,4 @@
-#include "ModuleInterface.h"
+#include "IModuleInterface.h"
 
 class Reader : public Module {
 

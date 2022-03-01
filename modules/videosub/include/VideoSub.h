@@ -1,4 +1,4 @@
-#include "ModuleInterface.h"
+#include "IModuleInterface.h"
 
 #include <gst/gst.h>
 #include <mutex>

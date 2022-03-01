@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "ModuleInterface.h"
+#include "IModuleInterface.h"
 
 #include <linux/joystick.h>
 #include <errno.h>
