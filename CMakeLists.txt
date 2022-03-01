@@ -16,7 +16,9 @@ add_executable(ControlCenter .
     src/Main.cpp
     src/ModuleHandler.cpp
     src/SignalHandler.cpp
-        src/Logger.cpp)
+    src/Logger.cpp
+    src/ParameterManager.cpp
+)
 
 set_target_properties(ControlCenter PROPERTIES
     VERSION ${PROJECT_VERSION}

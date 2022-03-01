@@ -3,6 +3,7 @@
 
 #include <dlfcn.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <filesystem>
 #include <iostream>
@@ -13,6 +14,7 @@
 #include "Logger.h"
 #include "ModuleInterface.h"
 #include "SignalHandler.h"
+#include "ParameterManager.h"
 
 class ModuleHandler {
 public:
@@ -23,18 +25,16 @@ public:
     int Deinit();
 
 private:
-    int Parse_Configuration();
-    int Register_Modules();
-    int Assign_Module_Parameters(std::shared_ptr<Module> module);
-    void Print_Module_Parameters(std::shared_ptr<Module> module);
 
-    const char* m_modules_cfg;
+    int Register_Modules();
+
     bool m_verbose;
-    pugi::xml_document m_modules_xml;
     std::vector<std::shared_ptr<Module>> m_registered_modules;
     SharedData_t m_shared_data;
     SignalHandler m_sig_handler;
     RBLogger::Logger m_logger;
+
+    std::unique_ptr<ParameterManager> m_parameter_manager;
 };
 
 #endif /* MODULEHANDLER_H */

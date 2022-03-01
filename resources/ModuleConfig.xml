@@ -2,7 +2,7 @@
 
 <modules>
 
-    <!-- <module name="Writer">
+    <module name="Writer">
         <parameters>
             <parameter name="TOP_SERVO" value="90" />
             <parameter name="RIGHT_SERVO" value="100" />
@@ -14,7 +14,7 @@
         <parameters>
             <parameter name="HELLO" value="Reader says Hello World :)" />
         </parameters>
-    </module> -->
+    </module>
 
     <module name="Controller">
         <parameters>
@@ -52,14 +52,14 @@
         </parameters>
     </module>
 
-    <!-- <module name="ObjectDetector">
+    <module name="ObjectDetector">
         <parameters>
             <parameter name="MODEL_PATH" value="/home/gjshk527/Repos/Steinbeis/adtf/adtf.experiments.video/object-detection/cpp-prototypes/tf-prototype/resources/ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8/saved_model" />
             <parameter name="LABEL_PATH" value="/home/gjshk527/Repos/Steinbeis/adtf/adtf.experiments.video/object-detection/cpp-prototypes/tf-prototype/resources/coco.names" />
             <parameter name="CONFIDENCE_THRESHOLD" value="0.5" />
             <parameter name="TIME_LOG" value="1" />
         </parameters>
-    </module> -->
+    </module>
 
     <module name="InoLink">
         <parameters>
