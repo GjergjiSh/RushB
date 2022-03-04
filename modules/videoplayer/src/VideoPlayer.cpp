@@ -12,14 +12,22 @@ int VideoPlayer::Init()
     logger.Info("Initializing...");
     cv::namedWindow("Video Viewer");
 
+    m_frame_height = std::stoi(parameters.at("FRAME_HEIGHT"));
+    m_frame_width = std::stoi(parameters.at("FRAME_WIDTH"));
+    Set_Resize(parameters.at("RESIZE"));
+
     return 0;
 }
 
 int VideoPlayer::Cycle_Step()
 {
-    m_frame_bgr= cv::Mat(480, 640, CV_8UC3, (void *)this->shared_data->video.frame);
+    m_frame_bgr= cv::Mat(m_frame_height, m_frame_width, CV_8UC3, (void *)this->shared_data->video.frame);
     if (m_frame_bgr.data) {
         cv::cvtColor(m_frame_bgr, m_frame_rgb, cv::COLOR_RGB2BGR);
+
+        if (m_resize_frames)
+            cv::resize(m_frame_rgb, m_frame_rgb, cv::Size(640, 460));
+
         cv::imshow("Video Viewer", m_frame_rgb);
         cv::waitKey(1);
     }
@@ -32,6 +40,17 @@ int VideoPlayer::Deinit()
     logger.Info("Deinitializing...");
     cv::destroyAllWindows();
     return 0;
+}
+
+void VideoPlayer::Set_Resize(std::string resize_parameter)
+{
+    if (resize_parameter == "1" ||
+        resize_parameter == "TRUE" ||
+        resize_parameter == "True") {
+        m_resize_frames = true;
+    } else {
+        m_resize_frames = false;
+    }
 }
 
 // Factory Method

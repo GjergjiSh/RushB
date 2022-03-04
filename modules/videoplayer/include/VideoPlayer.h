@@ -13,6 +13,12 @@ public:
     int Deinit(void) override;
 
 private:
+    void Set_Resize(std::string resize_parameter);
+
+    int m_frame_width;
+    int m_frame_height;
+    bool m_resize_frames;
+
     cv::Mat m_frame_bgr;
     cv::Mat m_frame_rgb;
 };

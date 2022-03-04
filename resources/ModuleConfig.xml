@@ -49,6 +49,9 @@
 
     <module name="VideoPlayer" active="1">
         <parameters>
+            <parameter name="FRAME_WIDTH" value="1920" />
+            <parameter name="FRAME_HEIGHT" value="1080" />
+            <parameter name="RESIZE" value="1" />
         </parameters>
     </module>
 
