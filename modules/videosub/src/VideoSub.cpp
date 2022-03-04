@@ -185,7 +185,6 @@ int VideoSub::Configure_Elements()
     gst_bus_add_signal_watch(bus);
     g_signal_connect(bus, "message", (GCallback)Bus_Message_Callback, m_pipeline->pipe);
 
-    //g_signal_connect(pipeline->videosink, "pull-sample", (GCallback)Update_Shared_Video_Data, this);
     g_object_set(G_OBJECT(m_pipeline->videosink), "emit-signals", TRUE, "sync", FALSE, NULL);
     g_signal_connect(m_pipeline->videosink, "new-sample", G_CALLBACK(Update_Shared_Video_Data), this);
 
