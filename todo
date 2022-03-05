@@ -5,3 +5,23 @@ videosub pad callpag logging
 # Ideas for the future
 
 Maybe change error log to throw instead of just print?
+
+
+---- Werid behaviour ----
+
+[19:34:51.116] [I][ParameterManager] ZmqPipeline ->  Parameter: OUT_PORT Value: 5001
+[19:34:51.116] [I][ParameterManager] ZmqPipeline ->  Parameter: SUB_TOPIC Value: USS
+[19:34:51.116] [I][ParameterManager] ZmqPipeline ->  Parameter: REMOTE Value: 127.0.0.1
+[19:34:51.116] [I][ModuleManager] Finished registering modules in  113 [ms]
+[19:34:51.116] [I][VideoPlayer] Initializing...
+[19:34:51.126] [I][ObjectDetector] Initializing...
+[19:34:51.126] [E][ModuleManager] Failed to initialize module - Erronous configuration for module: ObjectDetector _Map_base::at
+[19:34:51.126] [I][VideoPlayer] Deinitializing...
+[19:34:51.126] [I][ObjectDetector] Deinitializing...
+[19:34:51.126] [I][InoLink] Deinitializing...
+[19:34:51.126] [I][InoLink] Connection to Arduino deinitialized
+
+ino link deinitialized but never initialized???
+
+
+--- servos uninitalized ---

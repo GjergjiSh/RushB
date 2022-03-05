@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef DETECTION_UTILS_H
+#define DETECTION_UTILS_H
 
 #include <fstream>
 #include <iostream>
@@ -13,6 +13,21 @@ using namespace std::chrono;
 
 #define DRAW true
 #define NO_DRAW false
+
+typedef struct {
+    std::vector<int> class_ids;
+    std::vector<float> confidences;
+    std::vector<cv::Rect> rois; // Regions of Interest
+} tPredictions;
+
+typedef struct {
+    cv::Mat instance;
+    cv::Size size = cv::Size(416, 416);
+    cv::Scalar mean = cv::Scalar(0, 0, 0);
+    double scale = 1 / 255.0;
+    bool swap_rb = false;
+    bool crop = false;
+} tBlob;
 
 typedef struct {
     double time_pre_process; // [msec]
@@ -58,4 +73,4 @@ static void Draw_Bounding_Box(cv::Mat mat, tBoundingBox bounding_box)
 
 }
 
-#endif /* UTILS_H */
+#endif /* DETECTION_UTILS_H */

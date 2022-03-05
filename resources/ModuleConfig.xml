@@ -57,9 +57,19 @@
 
     <module name="ObjectDetector" active="1">
         <parameters>
-            <parameter name="MODEL_PATH" value="/home/gjshk527/Repos/Steinbeis/adtf/adtf.experiments.video/object-detection/cpp-prototypes/tf-prototype/resources/ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8/saved_model" />
+            <parameter name="INPUT_IMAGE_WIDTH" value="1920" />
+            <parameter name="INPUT_IMAGE_HEIGHT" value="1080" />
+
+            <parameter name="DETECTOR_TYPE" value="TF" />
             <parameter name="LABEL_PATH" value="/home/gjshk527/Repos/Steinbeis/adtf/adtf.experiments.video/object-detection/cpp-prototypes/tf-prototype/resources/coco.names" />
+
+            <parameter name="SAVED_MODEL_DIR" value="/home/gjshk527/Repos/Steinbeis/adtf/adtf.experiments.video/object-detection/cpp-prototypes/tf-prototype/resources/ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8/saved_model" />
+            <parameter name="YOLO_CFG_PATH" value="0.5" />
+            <parameter name="YOLO_WEIGHTS_PATH" value="0.5" />
+
             <parameter name="CONFIDENCE_THRESHOLD" value="0.5" />
+            <parameter name="NMS_THRESHOLD" value="0.5" />
+
             <parameter name="TIME_LOG" value="1" />
         </parameters>
     </module>

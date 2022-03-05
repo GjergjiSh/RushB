@@ -31,7 +31,7 @@ int ModuleManager::Init()
             };
         } catch (std::out_of_range& oor) {
             m_logger.Error_Description(
-                std::string("Failed to initialize module - Erronous configuration for module: ").append(module->name), oor.what());
+                std::string("Failed to initialize module - Invalid configuration for module: ").append(module->name), oor.what());
             return -1;
         }
     }
