@@ -43,8 +43,7 @@ typedef struct {
     std::string label;
 } tBoundingBox;
 
-static void Draw_Bounding_Box(cv::Mat mat, tBoundingBox bounding_box)
-{
+static void Draw_Bounding_Box(cv::Mat mat, const tBoundingBox &bounding_box) {
     int baseLine;
     std::string label = cv::format("%.2f", bounding_box.confidence);
     std::string distance = cv::format("%.3f ", bounding_box.distance);

@@ -43,16 +43,20 @@ typedef struct {
 
 class Module {
 public:
-    Module(){};
-    virtual ~Module(){};
-    virtual int Init(void) = 0;
-    virtual int Cycle_Step(void) = 0;
-    virtual int Deinit(void) = 0;
+    Module() {};
+
+    virtual ~Module() {};
+
+    virtual int Init() = 0;
+
+    virtual int Cycle_Step() = 0;
+
+    virtual int Deinit() = 0;
 
     std::string name;
     std::unordered_map<std::string, std::string> parameters;
-    SharedData_t* shared_data;
-    void* lib_handle;
+    SharedData_t *shared_data;
+    void *lib_handle;
 
     RBLogger::Logger logger;
 

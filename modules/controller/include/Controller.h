@@ -4,11 +4,12 @@
 #include "IModuleInterface.h"
 
 #include <linux/joystick.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <mutex>
-#include <string.h>
+
+#include <cerrno>
+#include <cstring>
 #include <thread>
 
 #define LEFTSTICK 0
@@ -44,20 +45,27 @@ class Controller : public Module {
 
 public:
     Controller();
-    ~Controller() = default;
-    int Init(void) override;
-    int Cycle_Step(void) override;
-    int Deinit(void) override;
+
+    ~Controller() override = default;
+
+    int Init() override;
+
+    int Cycle_Step() override;
+
+    int Deinit() override;
 
     int Process_Input();
+
     int Initialize_Device();
 
 private:
     void Handle_Button_Events();
+
     void Handle_Thumbstick_Events();
+
     bool Connected();
 
-    const char* m_device_path;
+    const char *m_device_path;
     int m_file_descriptor;
     state_t m_state;
     js_event m_event;

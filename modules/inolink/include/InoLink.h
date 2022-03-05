@@ -7,15 +7,21 @@ class InoLink : public Module {
 
 public:
     InoLink();
-    int Init(void) override;
-    int Cycle_Step(void) override;
-    int Deinit(void) override;
+
+    int Init() override;
+
+    int Cycle_Step() override;
+
+    int Deinit() override;
 
 private:
     int Init_Serial_Port();
+
     int Deinit_Serial_Port();
+
     std::string Convert_Servo_Vals();
+
     int Write_Servo_Vals();
 
-    mn::CppLinuxSerial::SerialPort* m_serial_port;
+    mn::CppLinuxSerial::SerialPort *m_serial_port;
 };

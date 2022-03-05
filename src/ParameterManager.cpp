@@ -17,12 +17,11 @@ int ParameterManager::Parse_Configuration()
     return 0;
 }
 
-// Convencience method for retrieving the a module's xml node in the module config
-pugi::xml_node ParameterManager::Get_Module_Node(std::shared_ptr<Module> module)
-{
+// Convenience method for retrieving the module's xml node in the module config
+pugi::xml_node ParameterManager::Get_Module_Node(const std::shared_ptr<Module> &module) {
     pugi::xml_node module_node = m_modules_xml.child("modules")
-                                              .find_child_by_attribute(
-                                              "name",module->name.c_str());
+            .find_child_by_attribute(
+                    "name", module->name.c_str());
 
     if (!module_node)
         m_logger.Warning("Module not found");
@@ -40,8 +39,7 @@ bool ParameterManager::Module_Activated(pugi::xml_node module)
 }
 
 // Assign the parameters defined in the XML config to the Module
-int ParameterManager::Assign_Module_Parameters(std::shared_ptr<Module> module)
-{
+int ParameterManager::Assign_Module_Parameters(const std::shared_ptr<Module> &module) {
     // Find the module's node in the XML config file
     pugi::xml_node module_node = Get_Module_Node(module);
     if (!module_node) return -1;
@@ -50,7 +48,7 @@ int ParameterManager::Assign_Module_Parameters(std::shared_ptr<Module> module)
     if (!parameters_node) return -1;
 
     // Assign the parameter names and values to the module
-    for (pugi::xml_node parameter : parameters_node.children()) {
+    for (pugi::xml_node parameter: parameters_node.children()) {
         auto name = parameter.attribute("name").value();
         auto val = parameter.attribute("value").value();
         module->parameters.insert(std::make_pair(name, val));
@@ -63,14 +61,13 @@ int ParameterManager::Assign_Module_Parameters(std::shared_ptr<Module> module)
 }
 
 // Print the assigned configuration
-void ParameterManager::Print_Module_Parameters(std::shared_ptr<Module> module)
-{
-        for (auto parameter : module->parameters) {
+void ParameterManager::Print_Module_Parameters(const std::shared_ptr<Module> &module) {
+    for (const auto &parameter: module->parameters) {
         std::cout << "[" << m_logger.Time_Stamp() << "] "
                   << "\033[1;32m[I][ParameterManager]\033[0m "
-                  <<  module->name << " -> "
+                  << module->name << " -> "
                   << " Parameter: " << parameter.first
                   << " Value: " << parameter.second
-                  <<  std::endl;
+                  << std::endl;
     }
 }

@@ -42,8 +42,7 @@ int VideoPlayer::Deinit()
     return 0;
 }
 
-void VideoPlayer::Set_Resize(std::string resize_parameter)
-{
+void VideoPlayer::Set_Resize(const std::string &resize_parameter) {
     if (resize_parameter == "1" ||
         resize_parameter == "TRUE" ||
         resize_parameter == "True") {

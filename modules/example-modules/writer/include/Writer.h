@@ -4,7 +4,10 @@ class Writer : public Module {
 
 public:
     Writer();
-    int Init(void) override;
-    int Cycle_Step(void) override;
-    int Deinit(void) override;
+
+    int Init() override;
+
+    int Cycle_Step() override;
+
+    int Deinit() override;
 };

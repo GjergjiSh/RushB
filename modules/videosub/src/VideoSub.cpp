@@ -1,19 +1,20 @@
 #include "VideoSub.h"
 
+// #TODO Actual bus message handling
 static GstBusSyncReply Bus_Message_Callback(GstBus* bus, GstMessage* message, gpointer pipeline)
 {
     switch (GST_MESSAGE_TYPE(message)) {
-    case GST_MESSAGE_ERROR:
-        gchar* debug;
-        GError* error;
-        gst_message_parse_error(message, &error, &debug);
-        g_free(debug);
-        g_printerr("[E][VideoPipeline ] %s\n", error->message);
-        g_error_free(error);
-        break;
+        case GST_MESSAGE_ERROR:
+            gchar *debug;
+            GError *error;
+            gst_message_parse_error(message, &error, &debug);
+            g_free(debug);
+            g_printerr("[E][VideoPipeline ] %s\n", error->message);
+            g_error_free(error);
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
     return GST_BUS_PASS;
 }
@@ -110,7 +111,7 @@ int VideoSub::Construct_Pipeline()
 {
     m_pipeline = std::make_shared<VideoPipeline_t>();
 
-    gst_init(NULL, NULL);
+    gst_init(nullptr, nullptr);
 
     if (Create_Elements() != 0) return -1;
     if (Configure_Elements() != 0) return -1;
@@ -120,17 +121,16 @@ int VideoSub::Construct_Pipeline()
     return 0;
 }
 
-int VideoSub::Create_Elements()
-{
+int VideoSub::Create_Elements() {
     m_pipeline->pipe = gst_pipeline_new("Subscriber Video Pipeline");
-    m_pipeline->udpsrc = gst_element_factory_make("udpsrc", NULL);
-    m_pipeline->filter = gst_element_factory_make("capsfilter", NULL);
-    m_pipeline->rtph264depay = gst_element_factory_make("rtph264depay", NULL);
-    m_pipeline->decodebin = gst_element_factory_make("decodebin", NULL);
-    m_pipeline->videoconvert = gst_element_factory_make("videoconvert", NULL);
-    m_pipeline->convert_filter = gst_element_factory_make("capsfilter", NULL);
-    m_pipeline->queue = gst_element_factory_make("queue", NULL);
-    m_pipeline->videosink = gst_element_factory_make("appsink", NULL);
+    m_pipeline->udpsrc = gst_element_factory_make("udpsrc", "source");
+    m_pipeline->filter = gst_element_factory_make("capsfilter", "source caps");
+    m_pipeline->rtph264depay = gst_element_factory_make("rtph264depay", "depay");
+    m_pipeline->decodebin = gst_element_factory_make("decodebin", "decode");
+    m_pipeline->videoconvert = gst_element_factory_make("videoconvert", "conversion");
+    m_pipeline->convert_filter = gst_element_factory_make("capsfilter", "conversion caps");
+    m_pipeline->queue = gst_element_factory_make("queue", "queue");
+    m_pipeline->videosink = gst_element_factory_make("appsink", "sink");
 
     if (!m_pipeline->pipe ||
         !m_pipeline->udpsrc ||
@@ -160,30 +160,35 @@ int VideoSub::Create_Elements()
     return 0;
 }
 
-int VideoSub::Configure_Elements()
-{
-    GstCaps* caps = gst_caps_new_simple("application/x-rtp",
-        "media", G_TYPE_STRING, "video",
-        "clock-rate", G_TYPE_INT, 90000,
-        "encoding-name", G_TYPE_STRING, "H264",
-        "payload", G_TYPE_INT, 96, NULL);
+int VideoSub::Configure_Elements() {
+    GstCaps *caps = gst_caps_new_simple("application/x-rtp",
+                                        "media", G_TYPE_STRING, "video",
+                                        "clock-rate", G_TYPE_INT, 90000,
+                                        "encoding-name", G_TYPE_STRING, "H264",
+                                        "payload", G_TYPE_INT, 96, NULL);
 
-    GstCaps* convert_caps = gst_caps_new_simple("video/x-raw",
-            "format", G_TYPE_STRING, "RGB", NULL);
+    GstCaps *convert_caps = gst_caps_new_simple("video/x-raw",
+                                                "format", G_TYPE_STRING, "RGB", NULL);
 
-    g_object_set(G_OBJECT(m_pipeline->udpsrc), "port", std::stoi(parameters.at("IN_PORT")), NULL);
     g_object_set(G_OBJECT(m_pipeline->filter), "caps", caps, NULL);
     g_object_set(G_OBJECT(m_pipeline->convert_filter), "caps", convert_caps, NULL);
+
     gst_caps_unref(caps);
     gst_caps_unref(convert_caps);
 
+    try {
+        g_object_set(G_OBJECT(m_pipeline->udpsrc), "port", std::stoi(parameters.at("IN_PORT")), NULL);
+    } catch (std::exception &e) {
+        logger.Error_Description("Failed to configure elements", e.what());
+        return -1;
+    }
 
     //Register Callbacks
     g_signal_connect(m_pipeline->decodebin, "pad-added", G_CALLBACK(Pad_Callback), m_pipeline->videoconvert);
-    GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(m_pipeline->pipe));
+    GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(m_pipeline->pipe));
 
     gst_bus_add_signal_watch(bus);
-    g_signal_connect(bus, "message", (GCallback)Bus_Message_Callback, m_pipeline->pipe);
+    g_signal_connect(bus, "message", (GCallback) Bus_Message_Callback, m_pipeline->pipe);
 
     g_object_set(G_OBJECT(m_pipeline->videosink), "emit-signals", TRUE, "sync", FALSE, NULL);
     g_signal_connect(m_pipeline->videosink, "new-sample", G_CALLBACK(Update_Shared_Video_Data), this);

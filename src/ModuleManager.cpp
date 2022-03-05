@@ -5,6 +5,7 @@ ModuleManager::ModuleManager(const char* modules_cfg, bool verbose)
     {
         m_logger.Set_Name("ModuleManager");
         m_parameter_manager = std::make_unique<ParameterManager>(modules_cfg);
+        m_shared_data = {0};
     }
 
 int ModuleManager::Init()
@@ -23,21 +24,22 @@ int ModuleManager::Init()
 
     // Initialize each loaded module
     auto start = std::chrono::system_clock::now();
-    for (auto module : m_registered_modules) {
+    for (const auto &module: m_registered_modules) {
         try {
             if (module->Init() != 0) {
                 m_logger.Error(std::string("Failed to initialize module: ").append(module->name));
                 return -1;
-            };
-        } catch (std::out_of_range& oor) {
+            }
+        } catch (std::out_of_range &oor) {
             m_logger.Error_Description(
-                std::string("Failed to initialize module - Invalid configuration for module: ").append(module->name), oor.what());
+                    std::string("Failed to initialize module - Invalid configuration for module: ").append(
+                            module->name), oor.what());
             return -1;
         }
     }
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    m_logger.Time_Info("Initialized modules in ", elapsed.count());
+    m_logger.Time_Info("Initialized modules in ", (int) elapsed.count());
 
 
     m_logger.Info("Initialization finished");
@@ -46,7 +48,7 @@ int ModuleManager::Init()
 
 int ModuleManager::Deinit()
 {
-    for (auto module : m_registered_modules) {
+    for (const auto &module: m_registered_modules) {
         module->Deinit();
 
         if (dlclose(module->lib_handle) != 0)
@@ -57,26 +59,28 @@ int ModuleManager::Deinit()
 }
 
 // Trigger cycle for each registered module
-int ModuleManager::Run()
-{
-    while (!m_sig_handler.Received_Exit_Sig()) {
-        for (auto module : m_registered_modules) {
+int ModuleManager::Run() {
+    while (!SignalHandler::Received_Exit_Sig()) {
+        for (const auto &module: m_registered_modules) {
             if (m_verbose) {
                 // Print cycle time for each module
                 auto start = std::chrono::system_clock::now();
+
                 if (module->Cycle_Step() != 0) {
                     m_logger.Error_Description("Cycle Step failed for module: ", module->name);
                     return -1;
-                };
+                }
+
                 auto end = std::chrono::system_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                m_logger.Time_Info(std::string("Cycle target: ").append(module->name), elapsed.count());
+                m_logger.Time_Info(std::string("Cycle target: ").append(module->name), (int) elapsed.count());
+
             } else {
                 // Trigger cycle without printing time info
                 if (module->Cycle_Step() != 0) {
                     m_logger.Error_Description("Cycle Step failed for module: ", module->name);
                     return -1;
-                };
+                }
             }
         }
         //usleep(100000);
@@ -125,7 +129,7 @@ int ModuleManager::Register_Modules()
 
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    m_logger.Time_Info("Finished registering modules in ", elapsed.count());
+    m_logger.Time_Info("Finished registering modules in ", (int) elapsed.count());
     return 0;
 }
 

@@ -18,18 +18,19 @@ int Controller::Cycle_Step()
 {
     Process_Input();
 
-    shared_data->servos.left_servo = m_state.stick_coordinates[LEFTSTICK].y;
-    shared_data->servos.right_servo = m_state.stick_coordinates[RIGHTSTICK].x;
+    shared_data->servos.left_servo = (int) m_state.stick_coordinates[LEFTSTICK].y;
+    shared_data->servos.right_servo = (int) m_state.stick_coordinates[RIGHTSTICK].x;
 
     // missing stuff for top servo
     return 0;
 }
 
-int Controller::Deinit()
-{
+int Controller::Deinit() {
     logger.Info("Deinitializing...");
-    if (close(m_file_descriptor) != 0)
+    if (close(m_file_descriptor) != 0) {
+        logger.Warning("Failed to close te file descriptor");
         return -1;
+    }
 
     return 0;
 }
@@ -67,9 +68,9 @@ void Controller::Handle_Thumbstick_Events()
 {
     size_t thumbstick = m_event.number / 2;
     if (m_event.number % 2 == 0)
-        m_state.stick_coordinates[thumbstick].x = -1 * ((m_event.value) / MAX_COORD_VAL);
+        m_state.stick_coordinates[thumbstick].x = (float) (-1 * ((m_event.value) / MAX_COORD_VAL));
     else
-        m_state.stick_coordinates[thumbstick].y = -1 * ((m_event.value) / MAX_COORD_VAL);
+        m_state.stick_coordinates[thumbstick].y = (float) (-1 * ((m_event.value) / MAX_COORD_VAL));
 }
 
 // Update the m_state of the buttons

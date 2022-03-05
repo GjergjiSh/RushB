@@ -8,9 +8,12 @@ class ObjectDetector : public Module {
 
 public:
     ObjectDetector();
-    int Init(void) override;
-    int Cycle_Step(void) override;
-    int Deinit(void) override;
+
+    int Init() override;
+
+    int Cycle_Step() override;
+
+    int Deinit() override;
 
 private:
     std::shared_ptr<IObjectDetector> detector;

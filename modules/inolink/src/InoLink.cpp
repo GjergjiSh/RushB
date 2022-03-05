@@ -20,8 +20,8 @@ int InoLink::Deinit()
 {
     logger.Info("Deinitializing...");
     if (Deinit_Serial_Port() != 0) {
-        return -1;
         delete m_serial_port;
+        return -1;
     }
 
     delete m_serial_port;

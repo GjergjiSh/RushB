@@ -2,7 +2,6 @@
 #define MODULEHANDLER_H
 
 #include <dlfcn.h>
-#include <string.h>
 #include <unistd.h>
 
 #include <filesystem>
@@ -10,6 +9,7 @@
 #include <pugixml.hpp>
 #include <unordered_map>
 #include <vector>
+#include <cstring>
 
 #include "Logger.h"
 #include "IModuleInterface.h"

@@ -14,31 +14,37 @@ namespace RBLogger {
 
 #define LOG_PREFIX msg_stream << m_name << TAG_END << " "
 
-static const std::string TAG_END = "]\033[0m";
-static const std::string ERROR = "\033[1;31m[E][";
-static const std::string INFO = "\033[1;32m[I][";
-static const std::string WARNING = "\033[1;33m[W][";
+    const std::string TAG_END = "]\033[0m";
+    const std::string ERROR = "\033[1;31m[E][";
+    const std::string INFO = "\033[1;32m[I][";
+    const std::string WARNING = "\033[1;33m[W][";
 
-class Logger {
+    class Logger {
 
-public:
-    Logger() = default;
-    ~Logger() = default;
+    public:
+        Logger() = default;
 
-    void Set_Name(std::string name);
+        ~Logger() = default;
 
-    void Info(std::string msg);
-    void Time_Info(std::string msg, int time);
-    void Warning(std::string msg);
-    void Error_Description(std::string msg, std::string err);
-    void Error(std::string msg);
+        void Set_Name(std::string name);
 
-    std::string Time_Stamp();
+        void Info(const std::string &msg);
 
-private:
-    std::string m_name;
-    void Log(std::string tag, std::stringstream& msg);
-};
+        void Time_Info(const std::string &msg, int time);
+
+        void Warning(const std::string &msg);
+
+        void Error_Description(const std::string &msg, const std::string &err);
+
+        void Error(const std::string &msg);
+
+        static std::string Time_Stamp();
+
+    private:
+        std::string m_name;
+
+        void Log(const std::string &tag, std::stringstream &msg);
+    };
 }
 
 #endif /* LOGGER_H */

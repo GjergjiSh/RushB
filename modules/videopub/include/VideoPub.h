@@ -28,16 +28,24 @@ class VideoPub : public Module {
 
 public:
     VideoPub();
-    int Init(void) override;
-    int Cycle_Step(void) override;
-    int Deinit(void) override;
+
+    int Init() override;
+
+    int Cycle_Step() override;
+
+    int Deinit() override;
 
 private:
     int Construct_Pipeline();
+
     int Destroy_Pipeline();
+
     int Set_Pipeline_State_Playing();
+
     int Create_Elements();
+
     int Configure_Elements();
+
     int Link_Elements();
 
     std::shared_ptr<VideoPipeline_t> m_pipeline;

@@ -47,18 +47,16 @@ int ZmqPipeline::Deinit()
 
 int ZmqPipeline::Construct_Sockets()
 {
-    try { // Create the m_publisher socket
-        m_publisher = zmq::socket_t(m_zmq_context, zmq::socket_type::pub);
-    } catch (zmq::error_t& e) {
-        logger.Error_Description("Failed to construct the m_publisher: ", e.what());
-        return -1;
-    }
+    // Create the publisher socket
+    m_publisher = zmq::socket_t(m_zmq_context, zmq::socket_type::pub);
 
     try { // Create the subscriber sockets and register the pub/sub topics
-        for (auto parameter : parameters) {
+        for (const auto &parameter: parameters) {
             if (parameter.first == "SUB_TOPIC") {
                 m_subscribers.emplace(std::make_pair(parameter.second,
-                                                     zmq::socket_t(m_zmq_context, zmq::socket_type::sub)));
+                                                     zmq::socket_t(m_zmq_context,
+                                                                   zmq::socket_type::sub)));
+
                 m_subscriber_topics.push_back(parameter.second);
             } else if (parameter.first == "PUB_TOPIC") {
                 m_publisher_topics.push_back(parameter.second);
@@ -183,7 +181,6 @@ int ZmqPipeline::Send(const std::string& topic, std::string& data)
 
 int ZmqPipeline::Recv(const std::string& topic, std::string& data)
 {
-    int recv = 0;
     zmq::message_t zmq_topic;
     zmq::message_t zmq_msg;
 
@@ -193,7 +190,7 @@ int ZmqPipeline::Recv(const std::string& topic, std::string& data)
 
         if (poll_item.revents & ZMQ_POLLIN) {
 
-            recv = m_subscribers.at(topic).recv(&zmq_topic, ZMQ_RCVMORE);
+            int recv = m_subscribers.at(topic).recv(&zmq_topic, ZMQ_RCVMORE);
             recv = m_subscribers.at(topic).recv(&zmq_msg) && recv;
 
             data.assign(static_cast<char*>(zmq_msg.data()), zmq_msg.size());

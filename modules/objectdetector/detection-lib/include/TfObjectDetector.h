@@ -27,7 +27,7 @@ private:
 
     void Warmup();
 
-    tensorflow::Tensor Convert_Mat_To_Tensor(cv::Mat src);
+    static tensorflow::Tensor Convert_Mat_To_Tensor(cv::Mat src);
 
     tensorflow::SavedModelBundle m_saved_model;
     tensorflow::SessionOptions m_session_options;

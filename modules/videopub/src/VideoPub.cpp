@@ -31,23 +31,22 @@ int VideoPub::Construct_Pipeline()
 {
     this->m_pipeline = std::make_shared<VideoPipeline_t>();
 
-    gst_init(NULL, NULL);
+    gst_init(nullptr, nullptr);
     if (Create_Elements() != 0) return -1;
     if (Configure_Elements() != 0) return -1;
     if (Link_Elements() != 0) return -1;
 
-    logger.Info("Video pipeline successfuly constructed");
+    logger.Info("Video pipeline successfully constructed");
     return 0;
 }
 
-int VideoPub::Create_Elements()
-{
+int VideoPub::Create_Elements() {
     this->m_pipeline->pipe = gst_pipeline_new("Publisher Video Pipeline");
-    this->m_pipeline->v4l2src = gst_element_factory_make("v4l2src", NULL);
-    this->m_pipeline->videoconvert = gst_element_factory_make("videoconvert", NULL);
-    this->m_pipeline->x264enc = gst_element_factory_make("x264enc", NULL);
-    this->m_pipeline->rtph264pay = gst_element_factory_make("rtph264pay", NULL);
-    this->m_pipeline->udpsink = gst_element_factory_make("udpsink", NULL);
+    this->m_pipeline->v4l2src = gst_element_factory_make("v4l2src", "source");
+    this->m_pipeline->videoconvert = gst_element_factory_make("videoconvert", "conversion");
+    this->m_pipeline->x264enc = gst_element_factory_make("x264enc", "decoding");
+    this->m_pipeline->rtph264pay = gst_element_factory_make("rtph264pay", "pay");
+    this->m_pipeline->udpsink = gst_element_factory_make("udpsink", "sink");
 
     if (!m_pipeline->pipe ||
         !this->m_pipeline->v4l2src ||
@@ -70,14 +69,18 @@ int VideoPub::Create_Elements()
     return 0;
 }
 
-int VideoPub::Configure_Elements()
-{
-    g_object_set(m_pipeline->v4l2src, "device", parameters.at("CAMERA_INDEX").c_str(), NULL);
-    g_object_set(m_pipeline->x264enc, "tune", 4, NULL);
-    g_object_set(m_pipeline->x264enc, "speed-preset", 1, NULL);
-    g_object_set(m_pipeline->x264enc, "bitrate", std::stoi(parameters.at("BITRATE")), NULL);
-    g_object_set(G_OBJECT(m_pipeline->udpsink), "host", parameters.at("REMOTE_HOST").c_str(), NULL);
-    g_object_set(G_OBJECT(m_pipeline->udpsink), "port", std::stoi(parameters.at("OUT_PORT")), NULL);
+int VideoPub::Configure_Elements() {
+    try {
+        g_object_set(m_pipeline->v4l2src, "device", parameters.at("CAMERA_INDEX").c_str(), NULL);
+        g_object_set(m_pipeline->x264enc, "tune", 4, NULL);
+        g_object_set(m_pipeline->x264enc, "speed-preset", 1, NULL);
+        g_object_set(m_pipeline->x264enc, "bitrate", std::stoi(parameters.at("BITRATE")), NULL);
+        g_object_set(G_OBJECT(m_pipeline->udpsink), "host", parameters.at("REMOTE_HOST").c_str(), NULL);
+        g_object_set(G_OBJECT(m_pipeline->udpsink), "port", std::stoi(parameters.at("OUT_PORT")), NULL);
+    } catch (std::exception &e) {
+        logger.Error_Description("Failed to configure elements", e.what());
+        return -1;
+    }
 
     return 0;
 }

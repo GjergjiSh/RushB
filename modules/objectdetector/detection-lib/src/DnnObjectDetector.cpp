@@ -36,7 +36,7 @@ std::vector<DetectionUtils::tBoundingBox> DnnObjectDetector::Detect(cv::Mat& src
     return bounding_boxes;
 }
 
-// Get all of the detected objects for which the confidence is higher than the configured threshhold
+// Get all the detected objects for which the confidence is higher than the configured threshold
 DetectionUtils::tPredictions DnnObjectDetector::Get_Confident_Predictions(cv::Mat& img, std::vector<cv::Mat>& net_output)
 {
     DetectionUtils::tPredictions predictions;
@@ -111,7 +111,7 @@ int32_t DnnObjectDetector::Init_Model()
 
     cv::cuda::printShortCudaDeviceInfo(cv::cuda::getDevice());
     int cuda_devices_number = cv::cuda::getCudaEnabledDeviceCount();
-    if (cuda_devices_number = 0)
+    if (cuda_devices_number == 0)
         m_logger->Warning("No cuda enabled devices found");
 
     cv::cuda::DeviceInfo device_info;
@@ -145,7 +145,7 @@ int DnnObjectDetector::Load_Labels()
 int32_t DnnObjectDetector::Init()
 {
     if (Init_Model() != 0) return -1;
-    if (Load_Labels() != 0) return -1;;
+    if (Load_Labels() != 0) return -1;
 
     Get_Output_Layer_Names();
     return 0;

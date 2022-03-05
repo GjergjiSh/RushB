@@ -8,12 +8,15 @@ class VideoPlayer : public Module {
 
 public:
     VideoPlayer();
-    int Init(void) override;
-    int Cycle_Step(void) override;
-    int Deinit(void) override;
+
+    int Init() override;
+
+    int Cycle_Step() override;
+
+    int Deinit() override;
 
 private:
-    void Set_Resize(std::string resize_parameter);
+    void Set_Resize(const std::string &resize_parameter);
 
     int m_frame_width;
     int m_frame_height;

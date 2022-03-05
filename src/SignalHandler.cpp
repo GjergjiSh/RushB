@@ -1,13 +1,12 @@
-#include <errno.h>
-#include <signal.h>
+#include <cerrno>
+#include <csignal>
 
 #include "SignalHandler.h"
 
 bool SignalHandler::received_exit_sig = false;
 
 // Returns the bool flag indicating whether we received an exit signal
-bool SignalHandler::Received_Exit_Sig()
-{
+bool SignalHandler::Received_Exit_Sig() {
     return received_exit_sig;
 }
 

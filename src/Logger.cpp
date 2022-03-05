@@ -1,39 +1,36 @@
 #include "Logger.h"
 
-void RBLogger::Logger::Info(std::string msg)
-{
+#include <utility>
+
+void RBLogger::Logger::Info(const std::string &msg) {
     std::stringstream msg_stream;
     LOG_PREFIX << msg;
 
     Log(RBLogger::INFO, msg_stream);
 }
 
-void RBLogger::Logger::Time_Info(std::string msg, int time)
-{
+void RBLogger::Logger::Time_Info(const std::string &msg, int time) {
     std::stringstream msg_stream;
     LOG_PREFIX << msg << " " << time << " [ms]";
 
     Log(RBLogger::INFO, msg_stream);
 }
 
-void RBLogger::Logger::Warning(std::string msg)
-{
+void RBLogger::Logger::Warning(const std::string &msg) {
     std::stringstream msg_stream;
     LOG_PREFIX << msg;
 
     Log(RBLogger::WARNING, msg_stream);
 }
 
-void RBLogger::Logger::Error_Description(std::string msg, std::string err)
-{
+void RBLogger::Logger::Error_Description(const std::string &msg, const std::string &err) {
     std::stringstream msg_stream;
     LOG_PREFIX << msg << " " << err;
 
     Log(RBLogger::ERROR, msg_stream);
 }
 
-void RBLogger::Logger::Error(std::string msg)
-{
+void RBLogger::Logger::Error(const std::string &msg) {
     std::stringstream msg_stream;
     LOG_PREFIX << msg;
 
@@ -42,7 +39,7 @@ void RBLogger::Logger::Error(std::string msg)
 
 void RBLogger::Logger::Set_Name(std::string name)
 {
-    m_name = name;
+    m_name = std::move(name);
 }
 
 std::string RBLogger::Logger::Time_Stamp()
@@ -64,8 +61,7 @@ std::string RBLogger::Logger::Time_Stamp()
     return timestamp.str();
 }
 
-void RBLogger::Logger::Log(std::string tag, std::stringstream& msg)
-{
+void RBLogger::Logger::Log(const std::string &tag, std::stringstream &msg) {
     std::cout << "[" << Time_Stamp() << "] "
               << tag << msg.str() << std::endl;
 }
