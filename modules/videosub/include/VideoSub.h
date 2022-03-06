@@ -34,24 +34,17 @@ public:
     VideoSub();
 
     int Init() override;
-
     int Cycle_Step() override;
-
     int Deinit() override;
 
     std::mutex video_mutex;
 
 private:
     int Construct_Pipeline();
-
     int Create_Elements();
-
     int Configure_Elements();
-
     int Link_Elements();
-
     int Destroy_Pipeline();
-
     int Set_Pipeline_State_Playing();
 
     std::shared_ptr<VideoPipeline_t> m_pipeline;

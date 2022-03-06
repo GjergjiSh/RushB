@@ -1,5 +1,4 @@
 
-sigsev when error with object detector
 videosub pad callpag logging
 
 # Ideas for the future
@@ -25,3 +24,6 @@ ino link deinitialized but never initialized???
 
 
 --- servos uninitalized ---
+
+
+Why was the vector of shared or unique ptr causing segfault when exiting?

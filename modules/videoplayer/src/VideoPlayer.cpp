@@ -52,8 +52,11 @@ void VideoPlayer::Set_Resize(const std::string &resize_parameter) {
     }
 }
 
-// Factory Method
-std::shared_ptr<Module> Create_Instance()
-{
-    return std::make_shared<VideoPlayer>();
+// Factory Methods
+Module *Create_Instance() {
+    return new VideoPlayer;
+}
+
+void Destroy_Instance(Module *module) {
+    delete module;
 }

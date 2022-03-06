@@ -97,9 +97,11 @@ int Controller::Process_Input()
     return 0;
 }
 
-// Factory Method
-std::shared_ptr<Module> Create_Instance()
-{
-    return std::make_shared<Controller>();
+// Factory Methods
+Module *Create_Instance() {
+    return new Controller;
 }
 
+void Destroy_Instance(Module *module) {
+    delete module;
+}

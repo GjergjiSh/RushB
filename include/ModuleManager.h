@@ -29,7 +29,7 @@ private:
     int Register_Modules();
 
     bool m_verbose;
-    std::vector<std::shared_ptr<Module>> m_registered_modules;
+    std::vector<Module *> m_registered_modules;
     SharedData_t m_shared_data;
     SignalHandler m_sig_handler;
     RBLogger::Logger m_logger;

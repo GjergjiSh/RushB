@@ -6,9 +6,9 @@
 class ZmqPipeline : public Module {
 public:
     ZmqPipeline();
-    int Init(void) override;
-    int Cycle_Step(void) override;
-    int Deinit(void) override;
+    int Init() override;
+    int Cycle_Step() override;
+    int Deinit() override;
 
 private:
     int Init_Connection();
@@ -26,7 +26,7 @@ private:
     int Deserialize_Uss(std::string& input_string, UltraSonicValues_Proto& uss);
     int Deserialize_Servos(std::string& input_string, ServoValues_Proto& servos);
 
-    int Publish_Servos(std::string& serovs);
+    int Publish_Servos(std::string& servos);
     int Publish_Uss(std::string& uss);
 
     int Update_Servos();

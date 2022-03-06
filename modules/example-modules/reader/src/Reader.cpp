@@ -27,13 +27,15 @@ int Reader::Cycle_Step()
     return 0;
 }
 
-int Reader::Deinit()
-{
+int Reader::Deinit() {
     return 0;
 }
 
-// Factory Method
-std::shared_ptr<Module> Create_Instance()
-{
-    return std::make_shared<Reader>();
+// Factory Methods
+Module *Create_Instance() {
+    return new Reader;
+}
+
+void Destroy_Instance(Module *module) {
+    delete module;
 }

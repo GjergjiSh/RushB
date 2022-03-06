@@ -302,8 +302,11 @@ int ZmqPipeline::Update_Servos()
     return 0;
 }
 
-// Factory Method
-std::shared_ptr<Module> Create_Instance()
-{
-    return std::make_shared<ZmqPipeline>();
+// Factory Methods
+Module *Create_Instance() {
+    return new ZmqPipeline;
+}
+
+void Destroy_Instance(Module *module) {
+    delete module;
 }

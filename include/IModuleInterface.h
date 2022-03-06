@@ -44,13 +44,9 @@ typedef struct {
 class Module {
 public:
     Module() {};
-
     virtual ~Module() {};
-
     virtual int Init() = 0;
-
     virtual int Cycle_Step() = 0;
-
     virtual int Deinit() = 0;
 
     std::string name;
@@ -63,10 +59,16 @@ public:
 };
 
 // Factory Methods
-typedef std::shared_ptr<Module> Create_t();
+typedef Module *Create_t();
+
+typedef void Destroy_t(Module *module);
 
 extern "C" {
-    std::shared_ptr<Module>Create_Instance();
+Module *Create_Instance();
+}
+
+extern "C" {
+void Destroy_Instance(Module *module);
 }
 
 #endif /* MODULE_H */

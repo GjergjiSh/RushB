@@ -18,6 +18,8 @@ namespace RBLogger {
     const std::string ERROR = "\033[1;31m[E][";
     const std::string INFO = "\033[1;32m[I][";
     const std::string WARNING = "\033[1;33m[W][";
+    const std::string DEBUG = "\033[1;36m[D][";
+
 
     class Logger {
 
@@ -33,6 +35,8 @@ namespace RBLogger {
         void Time_Info(const std::string &msg, int time);
 
         void Warning(const std::string &msg);
+
+        void Debug(const std::string &msg);
 
         void Error_Description(const std::string &msg, const std::string &err);
 

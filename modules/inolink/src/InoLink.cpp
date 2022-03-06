@@ -80,7 +80,7 @@ int InoLink::Write_Servo_Vals()
     try {
         const std::string output_servo_string =  Convert_Servo_Vals();
         m_serial_port->Write(output_servo_string);
-    } catch (mn::CppLinuxSerial::Exception& ex) {
+    } catch (mn::CppLinuxSerial::Exception &ex) {
         logger.Error_Description("Failed to write driver wishes to the robot.", ex.what());
         return -1;
     }
@@ -88,7 +88,10 @@ int InoLink::Write_Servo_Vals()
 }
 
 // Factory Method
-std::shared_ptr<Module> Create_Instance()
-{
-    return std::make_shared<InoLink>();
+Module *Create_Instance() {
+    return new InoLink;
+}
+
+void Destroy_Instance(Module *module) {
+    delete module;
 }

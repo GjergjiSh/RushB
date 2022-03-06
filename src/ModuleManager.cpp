@@ -46,13 +46,23 @@ int ModuleManager::Init()
     return 0;
 }
 
+// #TODO check if module is initialized before deinitializing it otherwise warnings and errors make no sense
 int ModuleManager::Deinit()
 {
     for (const auto &module: m_registered_modules) {
         module->Deinit();
 
+        auto Destroy_Module = (Destroy_t *) dlsym(module->lib_handle, "Destroy_Instance");
+        const char *dlsym_error = dlerror();
+        if (dlsym_error) {
+            m_logger.Warning(std::string("Failed to load the destroy symbol for: ").append(module->name));
+        }
+
+        // Destructor and delete delegated to the module's factory method
+        Destroy_Module(module);
+
         if (dlclose(module->lib_handle) != 0)
-            m_logger.Error_Description("Failed to destroy module :", dlerror());
+            m_logger.Warning(std::string("Failed to destroy module :").append(module->name + dlerror()));
     }
     m_logger.Info("Deinitialization finished");
     return 0;
@@ -106,24 +116,34 @@ int ModuleManager::Register_Modules()
         dlerror();
 
         // load the factory method of the Module
-        auto Create_Module = (Create_t*)dlsym(lib_handle, "Create_Instance");
-        const char* dlsym_error = dlerror();
+        auto Create_Module = (Create_t *) dlsym(lib_handle, "Create_Instance");
+        const char *dlsym_error = dlerror();
         if (dlsym_error) {
             m_logger.Error_Description("Failed to load symbol create: ", dlsym_error);
             return -1;
         }
 
         // Create the Module Instance
-        std::shared_ptr<Module> module = Create_Module();
+        // Constructor Delegated to the module's factory method
+        Module *module = Create_Module();
         module->lib_handle = lib_handle;
         module->shared_data = &m_shared_data;
 
         // Only register if the module is in the XML config
-        if(m_parameter_manager->Module_Activated(m_parameter_manager->Get_Module_Node(module))) {
+        if (m_parameter_manager->Module_Activated(m_parameter_manager->Get_Module_Node(module))) {
             // Assign the parameters defined in the XML config to the Module
             m_parameter_manager->Assign_Module_Parameters(module);
             // Register the Module Instance
             m_registered_modules.push_back(module);
+        } else {
+            auto Destroy_Module = (Destroy_t *) dlsym(lib_handle, "Destroy_Instance");
+            dlsym_error = dlerror();
+            if (dlsym_error) {
+                m_logger.Warning(std::string("Failed to load the destroy symbol for: ").append(module->name));
+            }
+
+            // Destructor and delete delegated to the module's factory method
+            Destroy_Module(module);
         }
     }
 

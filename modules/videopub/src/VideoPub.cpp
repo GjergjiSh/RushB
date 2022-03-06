@@ -123,8 +123,11 @@ int VideoPub::Set_Pipeline_State_Playing()
 }
 
 
-// Factory Method
-std::shared_ptr<Module> Create_Instance()
-{
-    return std::make_shared<VideoPub>();
+// Factory Methods
+Module *Create_Instance() {
+    return new VideoPub;
+}
+
+void Destroy_Instance(Module *module) {
+    delete module;
 }

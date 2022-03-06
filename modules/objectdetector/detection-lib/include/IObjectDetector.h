@@ -14,16 +14,13 @@ public:
     virtual int Init_Model() = 0;
     virtual int Load_Labels() = 0;
 
-    DetectionUtils::inference_time_result_t m_inference_time_result = {};
-
     const char* m_model_path;
     const char* m_label_path;
     float m_confidence_threshold;
     bool m_time_log;
-
     std::vector<std::string> m_labels;
-
     RBLogger::Logger* m_logger;
+    DetectionUtils::inference_time_result_t m_inference_time_result = {};
 };
 
 #endif /* IOBJECT_DETECTOR_H */

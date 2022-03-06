@@ -18,7 +18,7 @@ int ParameterManager::Parse_Configuration()
 }
 
 // Convenience method for retrieving the module's xml node in the module config
-pugi::xml_node ParameterManager::Get_Module_Node(const std::shared_ptr<Module> &module) {
+pugi::xml_node ParameterManager::Get_Module_Node(const Module *module) {
     pugi::xml_node module_node = m_modules_xml.child("modules")
             .find_child_by_attribute(
                     "name", module->name.c_str());
@@ -39,7 +39,7 @@ bool ParameterManager::Module_Activated(pugi::xml_node module)
 }
 
 // Assign the parameters defined in the XML config to the Module
-int ParameterManager::Assign_Module_Parameters(const std::shared_ptr<Module> &module) {
+int ParameterManager::Assign_Module_Parameters(Module *module) {
     // Find the module's node in the XML config file
     pugi::xml_node module_node = Get_Module_Node(module);
     if (!module_node) return -1;
@@ -61,9 +61,9 @@ int ParameterManager::Assign_Module_Parameters(const std::shared_ptr<Module> &mo
 }
 
 // Print the assigned configuration
-void ParameterManager::Print_Module_Parameters(const std::shared_ptr<Module> &module) {
+void ParameterManager::Print_Module_Parameters(const Module *module) {
     for (const auto &parameter: module->parameters) {
-        std::cout << "[" << m_logger.Time_Stamp() << "] "
+        std::cout << "[" << RBLogger::Logger::Time_Stamp() << "] "
                   << "\033[1;32m[I][ParameterManager]\033[0m "
                   << module->name << " -> "
                   << " Parameter: " << parameter.first

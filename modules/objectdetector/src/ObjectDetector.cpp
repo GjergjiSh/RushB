@@ -51,17 +51,19 @@ int ObjectDetector::Cycle_Step()
     if (frame.data) {
         std::vector<DetectionUtils::tBoundingBox> results = detector->Detect(frame, DRAW);
     }
-        return 0;
-    }
+    return 0;
+}
 
-int ObjectDetector::Deinit()
-{
+int ObjectDetector::Deinit() {
     logger.Info("Deinitializing...");
     return 0;
 }
 
-// Factory Method
-std::shared_ptr<Module> Create_Instance()
-{
-    return std::make_shared<ObjectDetector>();
+// Factory Methods
+Module *Create_Instance() {
+    return new ObjectDetector;
+}
+
+void Destroy_Instance(Module *module) {
+    delete module;
 }

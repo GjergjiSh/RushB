@@ -3,10 +3,10 @@
 
 #include "IModuleInterface.h"
 
-#include <linux/joystick.h>
 #include <fcntl.h>
-#include <unistd.h>
+#include <linux/joystick.h>
 #include <mutex>
+#include <unistd.h>
 
 #include <cerrno>
 #include <cstring>
@@ -38,39 +38,31 @@ struct state_t {
         std::make_pair(L3, RELEASED),
         std::make_pair(R3, RELEASED),
         std::make_pair(SELECT, RELEASED),
-        std::make_pair(START, RELEASED)};
+        std::make_pair(START, RELEASED)
+    };
 };
 
 class Controller : public Module {
 
 public:
     Controller();
-
     ~Controller() override = default;
 
     int Init() override;
-
     int Cycle_Step() override;
-
     int Deinit() override;
-
     int Process_Input();
-
     int Initialize_Device();
 
 private:
     void Handle_Button_Events();
-
     void Handle_Thumbstick_Events();
-
     bool Connected();
 
-    const char *m_device_path;
+    const char* m_device_path;
     int m_file_descriptor;
     state_t m_state;
     js_event m_event;
-
-
 };
 
 #endif /* CONTROLLER_H */

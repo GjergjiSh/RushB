@@ -43,7 +43,8 @@ typedef struct {
     std::string label;
 } tBoundingBox;
 
-static void Draw_Bounding_Box(cv::Mat mat, const tBoundingBox &bounding_box) {
+static void Draw_Bounding_Box(cv::Mat mat, const tBoundingBox& bounding_box)
+{
     int baseLine;
     std::string label = cv::format("%.2f", bounding_box.confidence);
     std::string distance = cv::format("%.3f ", bounding_box.distance);
@@ -56,7 +57,7 @@ static void Draw_Bounding_Box(cv::Mat mat, const tBoundingBox &bounding_box) {
     cv::rectangle(mat,
         cv::Point(bounding_box.roi.x, bounding_box.roi.y),
         cv::Point(bounding_box.roi.x + bounding_box.roi.width,
-                  bounding_box.roi.y + bounding_box.roi.height),
+            bounding_box.roi.y + bounding_box.roi.height),
         cv::Scalar(0, 255, 0), 4);
 
     rectangle(mat,
@@ -65,9 +66,9 @@ static void Draw_Bounding_Box(cv::Mat mat, const tBoundingBox &bounding_box) {
         cv::Scalar(255, 255, 255), cv::FILLED);
 
     cv::putText(mat,
-                label,
-                cv::Point(bounding_box.roi.x, top),
-                cv::FONT_ITALIC, 0.5, cv::Scalar(0, 0, 0), 1);
+        label,
+        cv::Point(bounding_box.roi.x, top),
+        cv::FONT_ITALIC, 0.5, cv::Scalar(0, 0, 0), 1);
 }
 
 }

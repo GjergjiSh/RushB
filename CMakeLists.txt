@@ -34,6 +34,7 @@ target_link_libraries(ControlCenter
     -pthread
 )
 
+
 add_custom_command( TARGET ControlCenter POST_BUILD
         COMMENT echo "Setting up..."
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/avail_modules

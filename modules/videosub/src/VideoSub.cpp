@@ -252,8 +252,11 @@ int VideoSub::Set_Pipeline_State_Playing()
     return 0;
 }
 
-// Factory Method
-std::shared_ptr<Module> Create_Instance()
-{
-    return std::make_shared<VideoSub>();
+// Factory Methods
+Module *Create_Instance() {
+    return new VideoSub;
+}
+
+void Destroy_Instance(Module *module) {
+    delete module;
 }

@@ -37,18 +37,23 @@ void RBLogger::Logger::Error(const std::string &msg) {
     Log(RBLogger::ERROR, msg_stream);
 }
 
-void RBLogger::Logger::Set_Name(std::string name)
-{
+void RBLogger::Logger::Set_Name(std::string name) {
     m_name = std::move(name);
 }
 
-std::string RBLogger::Logger::Time_Stamp()
-{
+void RBLogger::Logger::Debug(const std::string &msg) {
+    std::stringstream msg_stream;
+    LOG_PREFIX << msg;
+
+    Log(RBLogger::DEBUG, msg_stream);
+}
+
+std::string RBLogger::Logger::Time_Stamp() {
     // get a precise timestamp as a string
     const auto now = std::chrono::system_clock::now();
     const auto now_as_time_t = std::chrono::system_clock::to_time_t(now);
     const auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                           now.time_since_epoch()) % 1000;
+            now.time_since_epoch()) % 1000;
 
     // Format the timestamp
     std::stringstream timestamp;

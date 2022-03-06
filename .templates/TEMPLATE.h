@@ -7,9 +7,7 @@ public:
     TEMPLATE();
 
     int Init() override;
-
     int Cycle_Step() override;
-
     int Deinit() override;
 
 private:

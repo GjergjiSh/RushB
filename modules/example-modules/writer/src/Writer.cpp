@@ -34,13 +34,15 @@ int Writer::Cycle_Step()
     return 0;
 }
 
-int Writer::Deinit()
-{
+int Writer::Deinit() {
     return 0;
 }
 
 // Factory Method
-std::shared_ptr<Module> Create_Instance()
-{
-    return std::make_shared<Writer>();
+Module *Create_Instance() {
+    return new Writer;
+}
+
+void Destroy_Instance(Module *module) {
+    delete module;
 }
