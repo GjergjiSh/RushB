@@ -7,8 +7,6 @@ VideoPub::VideoPub() {
 
 int VideoPub::Init()
 {
-    logger.Info("Initializing...");
-
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;
 
@@ -23,7 +21,6 @@ int VideoPub::Cycle_Step()
 
 int VideoPub::Deinit()
 {
-    logger.Info("Deinitializing...");
     return Destroy_Pipeline();
 }
 

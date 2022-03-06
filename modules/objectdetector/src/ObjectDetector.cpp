@@ -7,8 +7,6 @@ ObjectDetector::ObjectDetector() {
 
 int ObjectDetector::Init()
 {
-    logger.Info("Initializing...");
-
     m_input_image_height = std::stoi(parameters.at("INPUT_IMAGE_HEIGHT"));
     m_input_image_width = std::stoi(parameters.at("INPUT_IMAGE_WIDTH"));
 
@@ -55,7 +53,6 @@ int ObjectDetector::Cycle_Step()
 }
 
 int ObjectDetector::Deinit() {
-    logger.Info("Deinitializing...");
     return 0;
 }
 

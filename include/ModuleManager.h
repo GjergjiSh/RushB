@@ -28,8 +28,14 @@ public:
 private:
 
     int Register_Modules();
-    Create_t *Load_Module_Create_Symbol(void *lib_handle);
-    Destroy_t *Load_Module_Destroy_Symbol(void *lib_handle);
+    int Init_Module(Module *const &module);
+
+    Module *Create_Module(void *lib_handle);
+    void Destroy_Module(void *lib_handle, Module *module);
+
+    void *Get_Module_Handle(const std::filesystem::directory_entry &entry);
+    Destroy_t *Get_Destroy_Symbol(void *lib_handle);
+    Create_t *Get_Create_Symbol(void *lib_handle);
 
     bool m_verbose;
     std::vector<Module *> m_registered_modules;
@@ -38,6 +44,8 @@ private:
     RBLogger::Logger m_logger;
 
     std::unique_ptr<ParameterManager> m_parameter_manager;
+
+    int Cycle_Module(Module *const &module);
 };
 
 #endif /* MODULEHANDLER_H */

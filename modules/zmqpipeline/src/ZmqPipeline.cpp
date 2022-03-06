@@ -1,5 +1,6 @@
 #include "ZmqPipeline.h"
 
+// #TODO redundant methods
 ZmqPipeline::ZmqPipeline()
 {
     name = "ZmqPipeline";
@@ -18,7 +19,6 @@ ZmqPipeline::ZmqPipeline()
 
 int ZmqPipeline::Init()
 {
-    logger.Info("Initializing...");
     return Init_Connection();
 }
 
@@ -41,7 +41,6 @@ int ZmqPipeline::Cycle_Step()
 
 int ZmqPipeline::Deinit()
 {
-    logger.Info("Deinitializing...");
     return Deinit_Connection();
 }
 

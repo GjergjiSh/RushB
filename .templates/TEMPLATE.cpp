@@ -11,7 +11,6 @@ int TEMPLATE::Init()
         std::cout << parameter.first << " value is " << parameter.second << std::endl;
     }
 
-    logger.LOG_INFO("Initializing...");
     return 0;
 }
 
@@ -24,14 +23,13 @@ int TEMPLATE::Cycle_Step()
 int TEMPLATE::Deinit()
 {
 
-    logger.LOG_INFO("Deinitializing...");
     return 0;
 }
 
 // Factory Methods
 Module* Create_Instance()
 {
-    return new ZmqPipeline;
+    return new TEMPLATE;
 }
 
 void Destroy_Instance(Module* module)

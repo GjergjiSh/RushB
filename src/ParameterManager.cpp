@@ -6,7 +6,7 @@ ParameterManager::ParameterManager(const char* modules_cfg) : m_modules_cfg(modu
 }
 
 // Load XML config file into memory
-int ParameterManager::Parse_Configuration()
+int ParameterManager::Load_Configuration()
 {
     pugi::xml_parse_result parse_result = m_modules_xml.load_file(m_modules_cfg);
     if (!parse_result) {

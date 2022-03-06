@@ -5,9 +5,9 @@ InoLink::InoLink() {
     logger.Set_Name(name);
 }
 
+// #TODO dedicated methods are redundant
 int InoLink::Init()
 {
-    logger.Info("Initializing...");
     return Init_Serial_Port();
 }
 
@@ -18,7 +18,6 @@ int InoLink::Cycle_Step()
 
 int InoLink::Deinit()
 {
-    logger.Info("Deinitializing...");
     if (Deinit_Serial_Port() != 0) {
         delete m_serial_port;
         return -1;

@@ -9,7 +9,6 @@ VideoPlayer::VideoPlayer()
 
 int VideoPlayer::Init()
 {
-    logger.Info("Initializing...");
     cv::namedWindow("Video Viewer");
 
     m_frame_height = std::stoi(parameters.at("FRAME_HEIGHT"));
@@ -37,7 +36,6 @@ int VideoPlayer::Cycle_Step()
 
 int VideoPlayer::Deinit()
 {
-    logger.Info("Deinitializing...");
     cv::destroyAllWindows();
     return 0;
 }

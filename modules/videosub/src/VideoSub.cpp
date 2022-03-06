@@ -87,8 +87,6 @@ VideoSub::VideoSub() {
 
 int VideoSub::Init()
 {
-    logger.Info("Video Sub Initializing...");
-
     if (Construct_Pipeline() != 0) return -1;
     if (Set_Pipeline_State_Playing() != 0) return -1;
 
@@ -103,7 +101,6 @@ int VideoSub::Cycle_Step()
 
 int VideoSub::Deinit()
 {
-    logger.Info("Deinitializing...");
     return Destroy_Pipeline();
 }
 

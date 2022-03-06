@@ -26,7 +26,6 @@ int Controller::Cycle_Step()
 }
 
 int Controller::Deinit() {
-    logger.Info("Deinitializing...");
     if (close(m_file_descriptor) != 0) {
         logger.Warning("Failed to close te file descriptor");
         return -1;
@@ -38,7 +37,6 @@ int Controller::Deinit() {
 // Open file descriptor for the controller
 int Controller::Initialize_Device()
 {
-    logger.Info("Initializing...");
     char name[256] = "Unknown";
     if ((m_file_descriptor = open(m_device_path, O_RDONLY | O_NONBLOCK)) < 0) {
         logger.Error_Description(std::string("Cannot open ").append(m_device_path), strerror(errno));

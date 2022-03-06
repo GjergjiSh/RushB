@@ -13,7 +13,7 @@ public:
 
     ~ParameterManager() = default;
 
-    int Parse_Configuration();
+    int Load_Configuration();
 
     pugi::xml_node Get_Module_Node(const Module *module);
 
