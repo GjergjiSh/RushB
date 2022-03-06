@@ -1,4 +1,5 @@
 #include "ModuleManager.h"
+#include "cassert"
 
 ModuleManager::ModuleManager(const char* modules_cfg, bool verbose)
     : m_verbose(verbose)
@@ -52,18 +53,20 @@ int ModuleManager::Deinit()
     for (const auto &module: m_registered_modules) {
         module->Deinit();
 
-        auto Destroy_Module = (Destroy_t *) dlsym(module->lib_handle, "Destroy_Instance");
-        const char *dlsym_error = dlerror();
-        if (dlsym_error) {
-            m_logger.Warning(std::string("Failed to load the destroy symbol for: ").append(module->name));
-        }
+        Destroy_t *Destroy_Module = Load_Module_Destroy_Symbol(module->lib_handle);
+
+        if (!Destroy_Module)
+            m_logger.Warning(std::string("Will not be able to destroy: ")
+                                     .append(module->name));
 
         // Destructor and delete delegated to the module's factory method
         Destroy_Module(module);
 
         if (dlclose(module->lib_handle) != 0)
-            m_logger.Warning(std::string("Failed to destroy module :").append(module->name + dlerror()));
+            m_logger.Warning(std::string("Failed to unload library for module :")
+                                     .append(module->name + dlerror()));
     }
+
     m_logger.Info("Deinitialization finished");
     return 0;
 }
@@ -106,7 +109,7 @@ int ModuleManager::Register_Modules()
     // Iterate the available libraries in the lib folder
     for (const auto & entry : std::filesystem::directory_iterator("./avail_modules")) {
         // Load the library
-        void* lib_handle = dlopen(entry.path().c_str(), RTLD_LAZY);
+        void *lib_handle = dlopen(entry.path().c_str(), RTLD_LAZY);
         if (!lib_handle) {
             m_logger.Error_Description("Failed to load library: ", dlerror());
             return -1;
@@ -116,12 +119,11 @@ int ModuleManager::Register_Modules()
         dlerror();
 
         // load the factory method of the Module
-        auto Create_Module = (Create_t *) dlsym(lib_handle, "Create_Instance");
-        const char *dlsym_error = dlerror();
-        if (dlsym_error) {
-            m_logger.Error_Description("Failed to load symbol create: ", dlsym_error);
+        Create_t *Create_Module = Load_Module_Create_Symbol(lib_handle);
+        if (!Create_Module)
             return -1;
-        }
+
+        assert(Create_Module);
 
         // Create the Module Instance
         // Constructor Delegated to the module's factory method
@@ -135,15 +137,15 @@ int ModuleManager::Register_Modules()
             m_parameter_manager->Assign_Module_Parameters(module);
             // Register the Module Instance
             m_registered_modules.push_back(module);
-        } else {
-            auto Destroy_Module = (Destroy_t *) dlsym(lib_handle, "Destroy_Instance");
-            dlsym_error = dlerror();
-            if (dlsym_error) {
-                m_logger.Warning(std::string("Failed to load the destroy symbol for: ").append(module->name));
-            }
 
+        } else {
+            Destroy_t *Destroy_Module = Load_Module_Destroy_Symbol(lib_handle);
             // Destructor and delete delegated to the module's factory method
-            Destroy_Module(module);
+            if (Destroy_Module)
+                Destroy_Module(module);
+            else
+                m_logger.Warning(std::string("Will not be able to destroy: ")
+                                         .append(module->name));
         }
     }
 
@@ -153,3 +155,25 @@ int ModuleManager::Register_Modules()
     return 0;
 }
 
+Create_t *ModuleManager::Load_Module_Create_Symbol(void *lib_handle) {
+    auto Create_Module = (Create_t *) dlsym(lib_handle, "Create_Instance");
+    const char *dlsym_error = dlerror();
+
+    if (dlsym_error) {
+        m_logger.Error_Description("Failed to load symbol create: ", dlsym_error);
+    }
+
+    return Create_Module;
+}
+
+Destroy_t *ModuleManager::Load_Module_Destroy_Symbol(void *lib_handle) {
+    auto Create_Module = (Destroy_t *) dlsym(lib_handle, "Destroy_Instance");
+    const char *dlsym_error = dlerror();
+
+    if (dlsym_error) {
+        m_logger.Warning(std::string("Failed to load the destroy symbol: ")
+                                 .append(dlsym_error));
+    }
+
+    return Create_Module;
+}

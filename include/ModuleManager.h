@@ -18,8 +18,9 @@
 
 class ModuleManager {
 public:
-    ModuleManager(const char* modules_cfg, bool verbose);
+    ModuleManager(const char *modules_cfg, bool verbose);
     ~ModuleManager() = default;
+
     int Init();
     int Run();
     int Deinit();
@@ -27,6 +28,8 @@ public:
 private:
 
     int Register_Modules();
+    Create_t *Load_Module_Create_Symbol(void *lib_handle);
+    Destroy_t *Load_Module_Destroy_Symbol(void *lib_handle);
 
     bool m_verbose;
     std::vector<Module *> m_registered_modules;
