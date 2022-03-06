@@ -11,11 +11,9 @@ public:
     int Deinit() override;
 
 private:
-    int Init_Connection();
     int Init_Endpoints();
     int Construct_Sockets();
     int Configure_Sockets();
-    int Deinit_Connection();
 
     int Send(const std::string& topic, std::string& data);
     int Recv(const std::string& topic, std::string&data);

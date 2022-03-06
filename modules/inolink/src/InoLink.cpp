@@ -5,29 +5,7 @@ InoLink::InoLink() {
     logger.Set_Name(name);
 }
 
-// #TODO dedicated methods are redundant
 int InoLink::Init()
-{
-    return Init_Serial_Port();
-}
-
-int InoLink::Cycle_Step()
-{
-    return Write_Servo_Vals();
-}
-
-int InoLink::Deinit()
-{
-    if (Deinit_Serial_Port() != 0) {
-        delete m_serial_port;
-        return -1;
-    }
-
-    delete m_serial_port;
-    return 0;
-}
-
-int InoLink::Init_Serial_Port()
 {
     try {
         std::string port = parameters.at("SERIAL_PORT");
@@ -45,15 +23,30 @@ int InoLink::Init_Serial_Port()
     return 0;
 }
 
-int InoLink::Deinit_Serial_Port()
+int InoLink::Cycle_Step()
+{
+    try {
+        const std::string output_servo_string =  Convert_Servo_Vals();
+        m_serial_port->Write(output_servo_string);
+    } catch (mn::CppLinuxSerial::Exception &ex) {
+        logger.Error_Description("Failed to write driver wishes to the robot.", ex.what());
+        return -1;
+    }
+    return 0;
+}
+
+int InoLink::Deinit()
 {
     try {
         m_serial_port->Close();
         logger.Info("Connection to Arduino deinitialized");
     } catch (mn::CppLinuxSerial::Exception& ex) {
         logger.Error_Description("Connection to Arduino failed to deinitialize", ex.what());
+        delete m_serial_port;
         return -1;
     }
+
+    delete m_serial_port;
     return 0;
 }
 
@@ -72,18 +65,6 @@ std::string InoLink::Convert_Servo_Vals()
                                          + right_servo
                                          + top_servo +"\n";
     return output_servo_string;
-}
-
-int InoLink::Write_Servo_Vals()
-{
-    try {
-        const std::string output_servo_string =  Convert_Servo_Vals();
-        m_serial_port->Write(output_servo_string);
-    } catch (mn::CppLinuxSerial::Exception &ex) {
-        logger.Error_Description("Failed to write driver wishes to the robot.", ex.what());
-        return -1;
-    }
-    return 0;
 }
 
 // Factory Method

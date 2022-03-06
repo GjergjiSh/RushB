@@ -19,7 +19,18 @@ ZmqPipeline::ZmqPipeline()
 
 int ZmqPipeline::Init()
 {
-    return Init_Connection();
+    try { // Initialize the zmq context
+        m_zmq_context = zmq::context_t(1);
+    } catch (zmq::error_t& e) {
+        logger.Error_Description("Failed to initialize the zmq context: ", e.what());
+        return -1;
+    }
+
+    if (Init_Endpoints() != 0) return -1;
+    if (Construct_Sockets() != 0) return -1;
+    if (Configure_Sockets() != 0) return -1;
+
+    return 0;
 }
 
 int ZmqPipeline::Cycle_Step()
@@ -41,7 +52,30 @@ int ZmqPipeline::Cycle_Step()
 
 int ZmqPipeline::Deinit()
 {
-    return Deinit_Connection();
+    try { // Close the m_publisher socket
+        m_publisher.close();
+    } catch (zmq::error_t& e) {
+        logger.Error_Description("Failed to close the m_publisher: ", e.what());
+        return -1;
+    }
+
+    try { // Close the subscriber sockets
+        for (auto& [topic, socket] : m_subscribers) {
+            socket.close();
+        }
+    } catch (zmq::error_t& e) {
+        logger.Error_Description("Failed to close the m_subscribers: ", e.what());
+        return -1;
+    }
+
+    try { // Close the zmq context
+        m_zmq_context.close();
+    } catch (zmq::error_t& e) {
+        logger.Error_Description("Failed to close the zmq context: ", e.what());
+        return -1;
+    }
+
+    return 0;
 }
 
 int ZmqPipeline::Construct_Sockets()
@@ -93,22 +127,6 @@ int ZmqPipeline::Configure_Sockets()
     return 0;
 }
 
-int ZmqPipeline::Init_Connection()
-{
-    try { // Initialize the zmq context
-        m_zmq_context = zmq::context_t(1);
-    } catch (zmq::error_t& e) {
-        logger.Error_Description("Failed to initialize the zmq context: ", e.what());
-        return -1;
-    }
-
-    if (Init_Endpoints() != 0) return -1;
-    if (Construct_Sockets() != 0) return -1;
-    if (Configure_Sockets() != 0) return -1;
-
-    return 0;
-}
-
 int ZmqPipeline::Init_Endpoints()
 {
     try { // Create the zmq endpoint strings
@@ -123,35 +141,6 @@ int ZmqPipeline::Init_Endpoints()
 
     return 0;
 }
-
-int ZmqPipeline::Deinit_Connection()
-{
-    try { // Close the m_publisher socket
-        m_publisher.close();
-    } catch (zmq::error_t& e) {
-        logger.Error_Description("Failed to close the m_publisher: ", e.what());
-        return -1;
-    }
-
-    try { // Close the subscriber sockets
-        for (auto& [topic, socket] : m_subscribers) {
-            socket.close();
-        }
-    } catch (zmq::error_t& e) {
-        logger.Error_Description("Failed to close the m_subscribers: ", e.what());
-        return -1;
-    }
-
-    try { // Close the zmq context
-        m_zmq_context.close();
-    } catch (zmq::error_t& e) {
-        logger.Error_Description("Failed to close the zmq context: ", e.what());
-        return -1;
-    }
-
-    return 0;
-}
-
 
 int ZmqPipeline::Send(const std::string& topic, std::string& data)
 {
